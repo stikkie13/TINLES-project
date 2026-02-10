@@ -1,0 +1,1 @@
+large part of his personality revolves around Jujutsu Kaisen 
