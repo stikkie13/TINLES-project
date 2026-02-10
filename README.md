@@ -1,5 +1,7 @@
 Dit is het project van de [TINLAB Embedded Systems](./assets/Cursushandleiding_TINLES03_2025_2026.pdf)
 
+Documentatie wordt gedaan via obsidian.
+
 Project leden:
 - [Ember Durkin](members/Ember-Durkin.md)
 - [Jordy van den Bos](./members/Jordy-van-den-Bos.md)
