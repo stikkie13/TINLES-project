@@ -1,0 +1,16 @@
+# Ignore everything in this folder
+*
+
+# But allow .tex and .pdf files
+!*.tex
+!*.pdf
+!*.bib
+!*.bst
+!*.png
+!*.jpg
+!*.jpeg
+!*.svg
+!*.eps
+
+# Keep this gitignore tracked
+!.gitignore
