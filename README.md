@@ -15,3 +15,8 @@ Project Ideeën
 - [Drone](./project-ideas/Drone.md)
 - [Air-fryer](./project-ideas/Air-fryer.md)
 
+
+
+
+cd paper
+xelatex paper.tex

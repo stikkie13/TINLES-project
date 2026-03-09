@@ -1,14 +1,111 @@
-\documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+\documentclass[a4paper,twoside,10pt]{article}
 
-\title{TINLABS\_EMBEDDED\_PAPER}
-\author{Jordy van den Bosch}
-\date{March 2026}
+% Use XeLaTeX or LuaLaTeX to enable system fonts via fontspec
+\usepackage{etoolbox}  % for patching commands
+\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
+\tolerance=1
 
+% Minimal, clean two-sided paper template with BibTeX and two-column flow
+% Use XeLaTeX or LuaLaTeX for system fonts (fontspec); fallback for pdfTeX.
+\usepackage{iftex}
+\ifPDFTeX
+    \usepackage[T1]{fontenc}
+    \usepackage{newtxtext,newtxmath}
+\else
+    \usepackage{fontspec}
+    \setmainfont{Times New Roman}
+\fi
+
+\usepackage{microtype}
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.8em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
+\setcounter{secnumdepth}{3}
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=cyan}
+
+\usepackage{geometry}
+\geometry{inner=2.8cm,outer=2.2cm,top=2.5cm,bottom=2.5cm}
+
+\usepackage[font=small]{caption}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{wrapfig}
+\usepackage{multicol}
+
+% Header/footer
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[RE,RO]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Small helpers
+\newcommand{\stakeholder}[1]{\paragraph{#1:}}
+
+% Document
 \begin{document}
 
-\maketitle
+% Manual centered title (26pt)
+\begin{center}
+    {\fontsize{26}{30}\selectfont\bfseries Flying Drone\par}
+\end{center}
+\thispagestyle{fancy}
+
+% Left-aligned author block (three-line format per author)
+\begin{flushleft}
+{\fontsize{10}{12}\selectfont
+Jordy van den Bos\\
+Technische Informatica (of Affiliation)\\
+Hogeschool Rotterdam\\[6pt]
+}
+\end{flushleft}
+\vspace{6pt}
+
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+{\small \textbf{\textit{Abstract}---This is an example abstract. It is bolded and begins with an italic \"Abstract\" followed by an em-dash. Replace with your real abstract.}}
+\end{minipage}\hfill
+
+\vspace{8pt}
+
+% Start two-column flow for the main body
+\begin{multicols}{2}
 
 \section{Introduction}
+Uncrewed aerial vehicles (drones) are increasingly used for inspection, photography, and research. This template demonstrates level 1--3 headings and a flowing two-column layout.
+
+\section{Drone size classes}
+Small, lightweight drones enable fast data collection in challenging environments. Designing reliable control and perception pipelines remains an active area of research.
+
+\section{Microcontroller}
+Foundational algorithms for many systems can be found in classic texts~\cite{knuth1997}. Uncrewed aerial vehicles (drones) are increasingly used for inspection, photography, and research. This template demonstrates level 1--3 headings and a flowing two-column layout.
+
+\section{Gyroscope}
+
+\section{Frame}
+
+\section{Electronic Speed Controller}
+
+\section{Total Weight}
+
+\section{Motor}
+Motors have 2 parts, the rotor and the stator. The rotor is. The part that spins and the stator is the part that stays in place.
+Motors come in two main classes: brushed and brushless. Brushed motors have two wires and generally have the coils on the rotor and magnets on the stator. When the coils are energized, it will create a magnetic field that will attract or repel the magnets on the stator, causing the rotor to spin. The coils get the energy through \"brushes\" and as the rotor spins, the direction of electric flow will change accordingly, keeping the motor spinning. These motors are inexpensive, but generally spin slower and are less efficient due to the friction of the brushes on the rotor. This is why most drones use motors found in the latter class, brushless motors(1).
+For this project we have decided to use brushless motors. Motors require an ESC (Electronic Speed Controller) to control the motors.
+
+\section{Propellers}
+
+
+\section{Results}
+Summarise experimental results.
+\end{multicols}
+
+% References
+\section{References}
+\bibliographystyle{plain}
+\bibliography{references}
 
 \end{document}
