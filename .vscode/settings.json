@@ -1,3 +1,4 @@
 {
-  "latex-workshop.latex.autoBuild.run": "never"
+  "latex-workshop.latex.autoBuild.run": "never",
+  "C_Cpp.default.compilerPath": "E:/mySys2/ucrt64/bin/gcc.exe"
 }
