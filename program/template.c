@@ -26,7 +26,7 @@ int preRoutine()
     int returnCode = 0;
 
     // Increment program cycle
-    programCycles++;
+    programCycle++;
 
     return returnCode;
 }

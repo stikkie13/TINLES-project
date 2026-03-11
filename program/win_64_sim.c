@@ -29,8 +29,8 @@ int preRoutine()
 {
     int returnCode = 0;
 
-    programCycles++;
-    
+    programCycle++;
+
     return returnCode;
 }
 
@@ -49,45 +49,32 @@ int getch_noblock()
         return -1;
 }
 
-char keystroke;
-long int cyclesSinceLastInput;
-bool resetCycles = false;
+long int cycleOfLastInput;
 int physicalInputRoutine()
 {
     int returnCode = 0;
     char userInput[64];
-    int newkeystroke = getch_noblock();
+    int keystroke = getch_noblock();
 
-    if (newkeystroke < 0)
+    if (keystroke > 0)
     {
-        cyclesSinceLastInput += 1;
-        return newkeystroke;
+        printf("\33[2K\r%c", keystroke);
+
+        switch (keystroke)
+        {
+        case 27:
+            persistFlag = false;
+            break;
+
+        default:
+
+            break;
+        }
+
+        printf("\t\tNumeric=%3i cycles since last input:%d", keystroke, (programCycle - cycleOfLastInput));
+        cycleOfLastInput = programCycle;
     }
-    else
-    {
-        keystroke = newkeystroke;
-        resetCycles = 1;
-    }
 
-    printf("\33[2K\r%c", keystroke);
-
-    switch (keystroke)
-    {
-    case 27:
-        persistFlag = false;
-        break;
-
-    default:
-
-        break;
-    }
-    printf("\t\tNumeric=%3i cycles since last input:%d", keystroke, cyclesSinceLastInput);
-
-    if (resetCycles)
-    {
-        resetCycles = 0;
-        cyclesSinceLastInput = 0;
-    }
     return returnCode;
 }
 

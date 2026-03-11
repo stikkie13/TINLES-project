@@ -9,7 +9,7 @@
 #define NL printf("\n")
 //      Program variables
 /*Used to keep track of the amount of loops that have occured. Never write to this variable outside of incrementing it in the preroutine*/
-unsigned long int programCycles = 0;
+unsigned long int programCycle = 0;
 //  Used to shut down the main thread.
 bool persistFlag = true;
 
