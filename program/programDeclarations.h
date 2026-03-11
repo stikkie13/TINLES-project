@@ -33,7 +33,6 @@ struct gyroscopeReadingStruct gryroscopeReadings[maxGyroscopeReadings];
 void initializeInterupts();
 /*Updates the sensors.*/
 void sensorRoutine();
-
 /*Checks if hardware interupts occured.*/
 void physicalInputRoutine();
 /*Used to control the motors*/
