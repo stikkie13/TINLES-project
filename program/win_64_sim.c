@@ -6,14 +6,37 @@
 #include <stdio.h>
 #include <conio.h> // MS dependent
 
-// declarations for Simulation in this file
-void initializeInterupts()
+// declarations
+struct accelometerReadingStruct
 {
+    /* data */
+};
+
+struct gyroscopeReadingStruct
+{
+    /* data */
+};
+
+// Routine implementations
+int setup()
+{
+    int returnCode = 0;
     printf("Serial interupts initialized\n");
+    return returnCode;
 }
 
-void sensorRoutine()
+int preRoutine()
 {
+    int returnCode = 0;
+
+    programCycles++;
+    
+    return returnCode;
+}
+
+int sensorRoutine()
+{
+    int returnCode = 0;
 }
 
 // Checks for input high flag then reads a buffer.
@@ -29,15 +52,16 @@ int getch_noblock()
 char keystroke;
 long int cyclesSinceLastInput;
 bool resetCycles = false;
-void physicalInputRoutine()
+int physicalInputRoutine()
 {
+    int returnCode = 0;
     char userInput[64];
     int newkeystroke = getch_noblock();
 
     if (newkeystroke < 0)
     {
         cyclesSinceLastInput += 1;
-        return;
+        return newkeystroke;
     }
     else
     {
@@ -64,10 +88,13 @@ void physicalInputRoutine()
         resetCycles = 0;
         cyclesSinceLastInput = 0;
     }
+    return returnCode;
 }
 
-void motorRoutine()
+int motorRoutine()
 {
+    int returnCode = 0;
+    return returnCode;
 }
 
 #endif

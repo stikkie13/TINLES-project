@@ -3,21 +3,50 @@
 #define programTarget "esp32-s3"
 #include "./programDeclarations.h"
 
-// declarations for physical controls in this file
-void initializeInterupts()
+// declarations for .....
+struct accelometerReadingStruct
 {
+    /* data */
+};
+
+struct gyroscopeReadingStruct
+{
+    /* data */
+};
+
+// Routine implementations
+int setup()
+{
+    int returnCode = 0;
+    return returnCode;
 }
 
-void sensorRoutine()
+int preRoutine()
 {
+    int returnCode = 0;
+
+    // Increment program cycle
+    programCycles++;
+
+    return returnCode;
 }
 
-void physicalInputRoutine()
+int physicalInputRoutine()
 {
+    int returnCode = 0;
+    return returnCode;
 }
 
-void motorRoutine()
+int sensorRoutine()
 {
+    int returnCode = 0;
+    return returnCode;
+}
+
+int motorRoutine()
+{
+    int returnCode = 0;
+    return returnCode;
 }
 
 #endif

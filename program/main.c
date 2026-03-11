@@ -1,13 +1,18 @@
 #include "programDeclarations.h"
-#include "sim.c"
+/*
+win_64_sim.c
+esp32-s3.c
+*/
+#include "win_64_sim.c"
 // #include "esp32-s3.c"
 
 int main(int argc, char const *argv[])
 {
-    initializeInterupts();
+    setup();
 
     while (persistFlag)
     {
+        preRoutine();
         physicalInputRoutine();
         sensorRoutine();
         motorRoutine();
