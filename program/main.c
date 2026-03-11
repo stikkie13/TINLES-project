@@ -6,7 +6,7 @@ int main(int argc, char const *argv[])
 {
     initializeInterupts();
 
-    while (1)
+    while (persistFlag)
     {
         physicalInputRoutine();
         sensorRoutine();

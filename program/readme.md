@@ -1,5 +1,5 @@
 # Getting started
-## Download GCC MinGW
+## Download GCC MinGW for windows
 Use gcc 32
 https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download
 

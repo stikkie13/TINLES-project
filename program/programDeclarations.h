@@ -1,5 +1,8 @@
 #pragma once // Prevents header from being implemented more then once. https://en.cppreference.com/w/cpp/preprocessor/impl
 
+//Concerns
+/*This file sets the standards that the implementations must comply with.*/
+
 #include <stdbool.h>
 
 // Utils
@@ -7,22 +10,12 @@
 // Program variables
 #define maxAccelometerReadings 24
 #define maxGyroscopeReadings 24
+//  Used to shut down the main thread.
+bool persistFlag = true;
 
-// Operation
-/*
-The idea is to use void pointers and structs.
-*/
-
-// Holds
-struct accelometerReadingStruct
-{
-    /* data */
-};
-
-struct gyroscopeReadingStruct
-{
-    /* data */
-};
+// Definitions
+struct accelometerReadingStruct;
+struct gyroscopeReadingStruct;
 
 // Arrays for sensor readings
 struct accelometerReadingStruct accelometerReadings[maxAccelometerReadings];
