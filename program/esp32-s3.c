@@ -7,6 +7,9 @@ void initializeInterupts()
 {
 }
 
+/*
+Potential features
+-Sensor refresh rates that allow us to only read a sensor each 2ms(any arbitrary amounts) and another as fast as possible*/
 void sensorRoutine()
 {
 }
