@@ -32,7 +32,7 @@ bool resetCycles = false;
 void physicalInputRoutine()
 {
     char userInput[64];
-    int newkeystroke = getch_noblock(); // Blocking
+    int newkeystroke = getch_noblock();
 
     if (newkeystroke < 0)
     {
