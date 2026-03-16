@@ -1,12 +1,6 @@
-\documentclass[a4paper,twoside,10pt]{article}
+\documentclass[conference]{IEEEtran}
 
-% Use XeLaTeX or LuaLaTeX to enable system fonts via fontspec
-\usepackage{etoolbox}  % for patching commands
-\patchcmd{\thebibliography}{\section*{\refname}}{}{}{}
-\tolerance=1
-
-% Minimal, clean two-sided paper template with BibTeX and two-column flow
-% Use XeLaTeX or LuaLaTeX for system fonts (fontspec); fallback for pdfTeX.
+% Font handling (XeLaTeX/LuaLaTeX vs. pdfLaTeX)
 \usepackage{iftex}
 \ifPDFTeX
     \usepackage[T1]{fontenc}
@@ -16,69 +10,99 @@
     \setmainfont{Times New Roman}
 \fi
 
-\usepackage{microtype}
-\usepackage{titlesec}
-\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
-\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.8em}{}
-\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{0.6em}{}
-\setcounter{secnumdepth}{3}
+% Typography and layout
+\usepackage{microtype}              % Better typography
+\usepackage{graphicx}               % Include images
+\usepackage{adjustbox}              % Scale tables/content
+\usepackage{array}                  % Enhanced table formatting
+\usepackage[font=small]{caption}   % Smaller captions
 
-\usepackage{hyperref}
+% Links and references
+\usepackage{url}                    % URL formatting
+\usepackage{hyperref}               % Clickable links
 \hypersetup{colorlinks=true,linkcolor=black,urlcolor=cyan}
 
-\usepackage{geometry}
-\geometry{inner=2.8cm,outer=2.2cm,top=2.5cm,bottom=2.5cm}
-
-\usepackage[font=small]{caption}
-\usepackage{graphicx}
-\usepackage{url}
-\usepackage{wrapfig}
-\usepackage{multicol}
-
-% Header/footer
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[RE,RO]{\footnotesize\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
-
-% Small helpers
+% Custom commands
 \newcommand{\stakeholder}[1]{\paragraph{#1:}}
 
-% Document
+% ============================================================================
+% DOCUMENT INFORMATION
+% ============================================================================
 \begin{document}
 
-% Manual centered title (26pt)
-\begin{center}
-    {\fontsize{26}{30}\selectfont\bfseries Flying Drone\par}
-\end{center}
-\thispagestyle{fancy}
+\title{Flying Drone}
 
-% Left-aligned author block (three-line format per author)
-\begin{flushleft}
-{\fontsize{10}{12}\selectfont
-Jordy van den Bos\\
-Technische Informatica (of Affiliation)\\
-Hogeschool Rotterdam\\[6pt]
+% ============================================================================
+% AUTHORS: Add or remove authors as needed
+% Use \and to separate authors into different columns
+% Use \\ to separate lines within the same author block
+% ============================================================================
+\author{
+    \IEEEauthorblockN{Jordy van den Bos}
+    \IEEEauthorblockA{
+        Technische Informatica\\
+        Hogeschool Rotterdam
+    }
+    \and
+    \IEEEauthorblockN{Wen Hao You}
+    \IEEEauthorblockA{
+        Technische Informatica\\
+        Hogeschool Rotterdam
+    }
+    \and
+    \IEEEauthorblockN{Mia Stikvoort}
+    \IEEEauthorblockA{
+        Technische Informatica\\
+        Hogeschool Rotterdam
+    }
+    \and
+    \IEEEauthorblockN{Ember Durkin}
+    \IEEEauthorblockA{
+        Technische Informatica\\
+        Hogeschool Rotterdam
+    }
+    \and
+    \IEEEauthorblockN{Peter Hoogenboezem}
+    \IEEEauthorblockA{
+        Technische Informatica\\
+        Hogeschool Rotterdam
+    }
 }
-\end{flushleft}
-\vspace{6pt}
 
-\noindent
-\begin{minipage}[t]{0.48\textwidth}
-{\small \textbf{\textit{Abstract}---This is an example abstract. It is bolded and begins with an italic \"Abstract\" followed by an em-dash. Replace with your real abstract.}}
-\end{minipage}\hfill
+\maketitle
 
-\vspace{8pt}
+\begin{abstract}
+This is an example abstract.
+\end{abstract}
 
-% Start two-column flow for the main body
-\begin{multicols}{2}
+\begin{IEEEkeywords}
+Drones, microcontrollers, gyroscopes, frames, ESCs, motors, propellers
+\end{IEEEkeywords}
 
 \section{Introduction}
 Uncrewed aerial vehicles (drones) are increasingly used for inspection, photography, and research. This template demonstrates level 1--3 headings and a flowing two-column layout.
 
 \section{Drone size classes}
-Small, lightweight drones enable fast data collection in challenging environments. Designing reliable control and perception pipelines remains an active area of research.
+% Use an in-column, non-floating table so it appears inside multicols
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{adjustbox}{max width=\columnwidth}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\columnwidth} >{\raggedright\arraybackslash}p{0.28\columnwidth} >{\raggedright\arraybackslash}p{0.28\columnwidth} >{\raggedright\arraybackslash}p{0.18\columnwidth}@{}}
+\hline
+Size & Length & Propeller diameter & Weight \\
+\hline
+Very small & 150\,mm or less & 51\,mm (2 inches) & 200\,g or less \\
+Small & Up to 300\,mm & 76--152\,mm (3--6 inches) & 200--1000\,g \\
+Medium & 300--1200\,mm & 150--640\,mm (6--25 inches) & 1--20\,kg \\
+Large & 1200\,mm and up & 640\,mm (25 inches) and up & 20\,kg and up \\
+\hline
+\end{tabular}
+\end{adjustbox}
+\caption{Drone size classes and typical dimensions}
+\label{tab:drone-sizes}
+\end{table}
 
 \section{Microcontroller}
 Foundational algorithms for many systems can be found in classic texts~\cite{knuth1997}. Uncrewed aerial vehicles (drones) are increasingly used for inspection, photography, and research. This template demonstrates level 1--3 headings and a flowing two-column layout.
@@ -93,7 +117,7 @@ Foundational algorithms for many systems can be found in classic texts~\cite{knu
 
 \section{Motor}
 Motors have 2 parts, the rotor and the stator. The rotor is. The part that spins and the stator is the part that stays in place.
-Motors come in two main classes: brushed and brushless. Brushed motors have two wires and generally have the coils on the rotor and magnets on the stator. When the coils are energized, it will create a magnetic field that will attract or repel the magnets on the stator, causing the rotor to spin. The coils get the energy through \"brushes\" and as the rotor spins, the direction of electric flow will change accordingly, keeping the motor spinning. These motors are inexpensive, but generally spin slower and are less efficient due to the friction of the brushes on the rotor. This is why most drones use motors found in the latter class, brushless motors(1).
+Motors come in two main classes: brushed and brushless. Brushed motors have two wires and generally have the coils on the rotor and magnets on the stator. When the coils are energized, it will create a magnetic field that will attract or repel the magnets on the stator, causing the rotor to spin. The coils get the energy through \"brushes\" and as the rotor spins, the direction of electric flow will change accordingly, keeping the motor spinning. These motors are inexpensive, but generally spin slower and are less efficient due to the friction of the brushes on the rotor. This is why most drones use motors found in the latter class, brushless motors (1).
 For this project we have decided to use brushless motors. Motors require an ESC (Electronic Speed Controller) to control the motors.
 
 \section{Propellers}
@@ -101,11 +125,8 @@ For this project we have decided to use brushless motors. Motors require an ESC 
 
 \section{Results}
 Summarise experimental results.
-\end{multicols}
-
 % References
-\section{References}
-\bibliographystyle{plain}
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \end{document}
