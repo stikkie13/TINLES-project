@@ -1,5 +1,7 @@
 Dit is het project van de [TINLAB Embedded Systems](./assets/Cursushandleiding_TINLES03_2025_2026.pdf)
 
+For the simulator visit [our other repository](https://github.com/XXXXKLAUSXXX/QuadCopterSim)
+
 Documentatie wordt gedaan via obsidian.
 
 Project leden:
