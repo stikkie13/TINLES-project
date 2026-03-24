@@ -11,24 +11,77 @@ float dt = 0.01;
 //PID
 double kPAngle = 0.6, kIAngle = 3.5, kDAngle = 0.03;
 double kPRate = 2, kIRate = 12, kDRate = 0;
-// ^ van CarbonAeronautics
 
-double pitchAngleI, pitchAngleD, desiredPitchRate, pitchAngleError, pitchAngleLastError;
-double pitchRateI, pitchRateD, pitchInput, pitchRateError, pitchRateLastError;
+struct PIDReturn {
+  double PID;
+  double integral;
+  double lastError;
+};
 
-double rollAngleI, rollAngleD, desiredRollRate, rollAngleError, rollAngleLastError;
-double rollRateI, rollRateD, rollInput, rollRateError, rollRateLastError;
-
+PIDReturn pitchAnglePID, rollAnglePID, pitchRatePID, rollRatePID;
 double targetPitch = 0, targetRoll = 0;
 
 int hover = 1150;
-
 int motorInputNW, motorInputNE, motorInputSE, motorInputSW;
 
 // New average formula (complimentary filter)
 void newAverage(float roll, float pitch, float Gx, float Gy) {
   rollAngle = (1 - alpha) * (rollAngle  + Gx * dt) + alpha * roll;
   pitchAngle = (1 - alpha) * (pitchAngle + Gy * dt) + alpha * pitch;
+}
+
+PIDReturn PID(double target, double current, double integral, double lastError, double kP, double kI, double kD) {
+  double error = target - current;
+  integral = integral + error * dt;
+  integral = constrain(integral, -400 / kI, 400 / kI);
+  double derivative = (error - lastError) / dt;
+  double PID = kP * error + kI * integral + kD * derivative;
+  PID = constrain(PID, -400, 400);
+  lastError = error;
+
+  return {PID, integral, lastError};
+}
+
+void stabilize(float Gx, float Gy) {
+  // --- outer PIDs for Pitch & Roll ---
+  pitchAnglePID = PID(targetPitch, pitchAngle, pitchAnglePID.integral, pitchAnglePID.lastError, kPAngle, kIAngle, kDAngle);
+  rollAnglePID = PID(targetRoll, rollAngle, rollAnglePID.integral, rollAnglePID.lastError, kPAngle, kIAngle, kDAngle);
+
+  // --- inner PIDs for Pitch & Roll ---
+  pitchRatePID = PID(pitchAnglePID.PID, Gy, pitchRatePID.integral, pitchRatePID.lastError, kPRate, kIRate, kDRate);
+  rollRatePID = PID(rollAnglePID.PID, Gx, rollRatePID.integral, rollRatePID.lastError, kPRate, kIRate, kDRate);
+
+  /* 
+  Single PID for Yaw and Altitude
+  */
+
+  // --- calculate motor inputs ---
+  motorInputNE = (hover - rollRatePID.PID + pitchRatePID.PID); // front right - counter clockwise
+  motorInputSE = (hover - rollRatePID.PID - pitchRatePID.PID); // rear right - clockwise
+  motorInputSW = (hover + rollRatePID.PID - pitchRatePID.PID); // rear left  - counter clockwise
+  motorInputNW = (hover + rollRatePID.PID + pitchRatePID.PID); // front left - clockwise
+
+  motorInputNE = constrain(motorInputNE, 1000, 2000);
+  motorInputSE = constrain(motorInputSE, 1000, 2000);
+  motorInputSW = constrain(motorInputSW, 1000, 2000);
+  motorInputNW = constrain(motorInputNW, 1000, 2000);
+
+  // --- apply to motors ---
+
+  // -- prints ---
+  Serial.print("Roll: ");
+  Serial.print(rollAngle);
+  Serial.print(" | Pitch: ");
+  Serial.println(pitchAngle);
+  
+  Serial.print("NE: ");
+  Serial.print(motorInputNE);
+  Serial.print(" | SE: ");
+  Serial.print(motorInputSE);
+  Serial.print(" | SW: ");
+  Serial.print(motorInputSW);
+  Serial.print(" | NW: ");
+  Serial.println(motorInputNW);
 }
 
 void setup() {
@@ -51,10 +104,10 @@ void setup() {
 
   Serial.begin(115200);
 
-  pitchAngleI = 0;
-  rollAngleI = 0;
-  pitchRateI = 0;
-  rollRateI = 0;
+  pitchAnglePID.integral = 0;
+  rollAnglePID.integral = 0;
+  pitchRatePID.integral = 0; 
+  rollRatePID.integral = 0;
 }
 
 void loop() {
@@ -111,70 +164,9 @@ void loop() {
     newAverage(roll, pitch, Gx, Gy);
   }
 
-  // --- outer PIDs for Pitch & Roll ---
-  pitchAngleError = targetPitch - pitchAngle;
-  pitchAngleI = pitchAngleI + pitchAngleError * dt;
-  pitchAngleI = constrain(pitchAngleI, -400 / kIAngle, 400 / kIAngle);
-  pitchAngleD = (pitchAngleError - pitchAngleLastError) / dt;
-  desiredPitchRate = kPAngle * pitchAngleError + kIAngle * pitchAngleI + kDAngle * pitchAngleD;
-  desiredPitchRate = constrain(desiredPitchRate, -400, 400);
-  pitchAngleLastError = pitchAngleError;
-
-  rollAngleError = targetRoll - rollAngle;
-  rollAngleI = rollAngleI + rollAngleError * dt;
-  rollAngleI = constrain(rollAngleI, -400 / kIAngle, 400 / kIAngle);
-  rollAngleD = (rollAngleError - rollAngleLastError) / dt;
-  desiredRollRate = kPAngle * rollAngleError + kIAngle * rollAngleI + kDAngle * rollAngleD;
-  desiredRollRate = constrain(desiredRollRate, -400, 400);
-  rollAngleLastError = rollAngleError;
-
-  // --- inner PIDs for Pitch & Roll ---
-  pitchRateError = desiredPitchRate - Gy;
-  pitchRateI = pitchRateI + pitchRateError * dt;
-  pitchRateI = constrain(pitchRateI, -400 / kIRate, 400 / kIRate);
-  pitchRateD = (pitchRateError - pitchRateLastError) / dt;
-  pitchInput = kPRate * pitchRateError + kIRate * pitchRateI + kDRate * pitchRateD;
-  pitchInput = constrain(pitchInput, -400, 400);
-  pitchRateLastError = pitchRateError;
-
-  rollRateError = desiredRollRate - Gx;
-  rollRateI = rollRateI + rollRateError * dt;
-  rollRateI = constrain(rollRateI, -400 / kIRate, 400 / kIRate);
-  rollRateD = (rollRateError - rollRateLastError) / dt;
-  rollInput = kPRate * rollRateError + kIRate * rollRateI + kDRate * rollRateD;
-  rollInput = constrain(rollInput, -400, 400);
-  rollRateLastError = rollRateError;
-
-  /* 
-  Single PID for Yaw and Altitude
-  */
-
-  // --- calculate motor inputs ---
-  motorInputNE = (hover - rollInput + pitchInput); // front right - counter clockwise
-  motorInputSE = (hover - rollInput - pitchInput); // rear right - clockwise
-  motorInputSW = (hover + rollInput - pitchInput); // rear left  - counter clockwise
-  motorInputNW = (hover + rollInput + pitchInput); // front left - clockwise
-
-  motorInputNE = constrain(motorInputNE, 1000, 2000);
-  motorInputSE = constrain(motorInputSE, 1000, 2000);
-  motorInputSW = constrain(motorInputSW, 1000, 2000);
-  motorInputNW = constrain(motorInputNW, 1000, 2000);
+  // --- Stabilisation ---
+  stabilize(Gx, Gy);
 
   unsigned long elapsed = micros() - startTime;
   dt = elapsed / 1000000.0; // Update dt dynamically
-
-
-  Serial.print("Roll: ");
-  Serial.print(rollAngle);
-  Serial.print(" | Pitch: ");
-  Serial.println(pitchAngle);
-  
-  Serial.print("NE: ");
-  Serial.print(motorInputNE);
-  Serial.print(" | SE: ");
-  Serial.print(motorInputSE);
-  Serial.print(" | SW: ");
-  Serial.print(motorInputSW);
-  Serial.print(" | NW: ");
-  Serial.println(motorInputNW);
 }
