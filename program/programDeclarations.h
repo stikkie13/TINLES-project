@@ -9,9 +9,11 @@
 #define maxGyroscopeReadings 24
 
 // Outputs
-/*A floating point number*/
+/*unit: Floating point number
+Range: 0-1
+*/
 typedef double motorOutput;
-/*Unit: 
+/*Unit:
 Output: 0-1
 Description: To use this variable multiply max_pulse_width. If this is 0 no pulse should occur, if this is 1 the pin should be writing high without pause.
 */
@@ -33,12 +35,18 @@ struct accelometerReadingStruct accelometerReadings[maxAccelometerReadings];
 struct gyroscopeReadingStruct gryroscopeReadings[maxGyroscopeReadings];
 
 // routines
+
+typedef struct routineReturnStruct
+{
+    int code;
+} routineReturn;
 /*Used to set hardware and software interupts.*/
-void initializeInterupts();
+
+routineReturn initializeInterupts();
 /*Updates the sensors.*/
-void sensorRoutine();
+routineReturn sensorRoutine();
 
 /*Checks if hardware interupts occured.*/
-void physicalInputRoutine();
+routineReturn physicalInputRoutine();
 /*Used to control the motors*/
-void motorRoutine();
+routineReturn motorRoutine();
