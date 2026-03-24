@@ -45,7 +45,6 @@ typedef struct routineReturnStruct
 routineReturn initializeInterupts();
 /*Updates the sensors.*/
 routineReturn sensorRoutine();
-
 /*Checks if hardware interupts occured.*/
 routineReturn physicalInputRoutine();
 /*Used to control the motors*/
