@@ -11,6 +11,7 @@
 !*.jpeg
 !*.svg
 !*.eps
+!*.md
 
 # Keep this gitignore tracked
 !.gitignore
