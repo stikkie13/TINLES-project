@@ -40,8 +40,8 @@ typedef struct routineReturnStruct
 {
     int code;
 } routineReturn;
-/*Used to set hardware and software interupts.*/
 
+/*Used to set hardware and software interupts.*/
 routineReturn initializeInterupts();
 /*Updates the sensors.*/
 routineReturn sensorRoutine();
