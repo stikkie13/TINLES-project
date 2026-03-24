@@ -8,10 +8,14 @@
 #define maxAccelometerReadings 24
 #define maxGyroscopeReadings 24
 
-// Operation
-/*
-The idea is to use void pointers and structs.
+// Outputs
+/*A floating point number*/
+typedef double motorOutput;
+/*Unit: 
+Output: 0-1
+Description: To use this variable multiply max_pulse_width. If this is 0 no pulse should occur, if this is 1 the pin should be writing high without pause.
 */
+motorOutput motorOutputs[4];
 
 // Holds
 struct accelometerReadingStruct

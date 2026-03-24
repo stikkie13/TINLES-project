@@ -31,6 +31,7 @@ int hover;
 /**/
 int motorInputNW, motorInputNE, motorInputSE, motorInputSW;
 
+
 // External variables from the gyroscope
 /**/
 extern float rollAngle;
@@ -40,4 +41,3 @@ extern float pitchAngle;
 extern float alpha;
 /*(presumedly) Delta Time*/
 extern float dt;
-
