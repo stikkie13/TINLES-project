@@ -4,7 +4,7 @@
 #include "./simulator.c"
 #include "./pid.ambigious.c"
 
-struct pidStruct rolPid = {
+struct pidStruct rollPid = {
     1,   // Propertional gain constant
     0.1, // Integral gain constant
     5,   // Derivative gain constant
@@ -51,12 +51,15 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
 {
     pidNumber motorSpeed[4];
 
-    // Step pids
-    PID_Step(&rollPid, gyro[0], rollTarget);
-    PID_Step(&pitchPid, gyro[1], pitchTarget);
+    // Step
+    // asuming front left is [0]. {1,-1,-1,1}
+    pidNumber rollCommand = PID_Step(&rollPid, gyro[0], rollTarget);
+    // {1,1,-1,-1}
+    pidNumber pitchCommand = PID_Step(&pitchPid, gyro[1], pitchTarget);
 
     for (int i = 0; i < 4; i++)
     {
+
         duty_cycle[i] = motorSpeed[i];
     }
 }
