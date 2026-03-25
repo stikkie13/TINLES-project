@@ -22,7 +22,7 @@ struct motionSensorStruct motionSensors[4];
 0: ints
 1: floats
 2: structs*/
-void *ptrs[] = {ints, floats, motionSensors};
+void  *ptrs[] = {ints, floats, motionSensors};
 
 int main(int argc, char const *argv[])
 {

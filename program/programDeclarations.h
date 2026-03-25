@@ -1,5 +1,8 @@
 #pragma once // Prevents header from being implemented more then once. https://en.cppreference.com/w/cpp/preprocessor/impl
 
+// Concerns
+/*This file sets the standards that the implementations must comply with.*/
+
 #include <stdbool.h>
 
 // Utils
