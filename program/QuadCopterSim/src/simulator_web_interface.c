@@ -10,8 +10,8 @@
 // #include "simulator.c" // Redundant
 
 // #include "./exampleController.h"
-// #include "./standardController.h"
-#include "./pidController.h"
+#include "./standardController.h"
+// #include "./pidController.h"
 
 double state_new[17];
 double state_previous[17] = {
