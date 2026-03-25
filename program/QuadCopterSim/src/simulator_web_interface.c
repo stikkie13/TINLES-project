@@ -9,8 +9,8 @@
 #include <time.h>
 // #include "simulator.c" // Redundant
 
-// #include "./exampleController.h"
-#include "./standardController.h"
+#include "./exampleController.h"
+// #include "./standardController.h"
 
 double state_new[17];
 double state_previous[17] = {
