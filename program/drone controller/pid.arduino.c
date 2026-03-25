@@ -1,5 +1,5 @@
 #ifndef PIDImplementation
-#define PIDImplementation "standard"
+#define PIDImplementation "arduino PID"
 
 /*
 Prints info
