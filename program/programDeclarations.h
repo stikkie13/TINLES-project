@@ -41,6 +41,8 @@ typedef struct routineReturnStruct
     int code;
 } routineReturn;
 
+/*Runs once before initializing interupts*/
+routineReturn runOnceAtStart();
 /*Used to set hardware and software interupts.*/
 routineReturn initializeInterupts();
 /*Updates the sensors.*/

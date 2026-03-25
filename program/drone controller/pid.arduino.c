@@ -1,11 +1,102 @@
 #ifndef PIDImplementation
-#define PIDImplementation "arduino"
+#define PIDImplementation "standard"
 
+/*
+Prints info
+*/
+int printInfo();
+/*
+ */
+int constrain(int input, int lowerRange, int higherRange);
+
+#ifdef programTarget "arduino"
 #include <Arduino.h>
 #include <Wire.h>
 
+int printInfo()
+{
+    Serial.print("Roll: ");
+    Serial.print(rollAngle);
+    Serial.print(" | Pitch: ");
+    Serial.println(pitchAngle);
 
-#include "./pid.h"
+    Serial.print("NE: ");
+    Serial.print(motorInputNE);
+    Serial.print(" | SE: ");
+    Serial.print(motorInputSE);
+    Serial.print(" | SW: ");
+    Serial.print(motorInputSW);
+    Serial.print(" | NW: ");
+    Serial.println(motorInputNW);
+}
+#endif
+
+#ifdef programTarget "simulator"
+int printInfo() {}
+
+int constrain(int input, int lowerRange, int higherRange)
+{
+    int returnValue = input;
+    if (input < lowerRange)
+    {
+        returnValue = lowerRange;
+    }
+    else if (input > higherRange)
+    {
+        returnValue = higherRange
+    }
+
+    return returnValue;
+}
+#endif
+
+// Table of contents
+/*
+    Declarations of core variables
+    External variables from the Gyroscope
+    Declarations of core functions
+*/
+
+// #############################################################################
+// Program declarations
+// #############################################################################
+
+/**/
+struct PIDReturn
+{
+    /**/
+    double PID;
+    /**/
+    double integral;
+    /**/
+    double lastError;
+};
+
+/*Ubicoders*/
+double kP, kI, kD;
+/**/
+struct PIDReturn pitchPID, rollPID;
+/**/
+double targetPitch, targetRoll;
+/*unit:
+range:1150?*/
+int hover;
+/**/
+int motorInputNW, motorInputNE, motorInputSE, motorInputSW;
+
+// External variables from the gyroscope
+/**/
+float rollAngle;
+/**/
+float pitchAngle;
+/**/
+float alpha;
+/*(presumedly) Delta Time*/
+float dt;
+
+// #############################################################################
+// Program definitions
+// #############################################################################
 
 /*Ubicoders*/
 kP = 0.5, kI = 0.05, kD = 0.1;
@@ -41,8 +132,7 @@ struct PIDReturn PID(double target, double current, double integral, double last
     return returnValue;
 }
 
-void
-stabilize()
+void stabilize()
 {
     // --- PIDs for Pitch & Roll ---
     pitchPID = PID(targetPitch, pitchAngle, pitchPID.integral, pitchPID.lastError, kP, kI, kD);
@@ -62,19 +152,6 @@ stabilize()
     // --- apply to motors ---
 
     // -- prints ---
-    Serial.print("Roll: ");
-    Serial.print(rollAngle);
-    Serial.print(" | Pitch: ");
-    Serial.println(pitchAngle);
-
-    Serial.print("NE: ");
-    Serial.print(motorInputNE);
-    Serial.print(" | SE: ");
-    Serial.print(motorInputSE);
-    Serial.print(" | SW: ");
-    Serial.print(motorInputSW);
-    Serial.print(" | NW: ");
-    Serial.println(motorInputNW);
 }
 
 #endif
