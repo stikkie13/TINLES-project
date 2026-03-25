@@ -2,7 +2,6 @@
 #define controllerTarg "example"
 
 #include "./simulator.c"
-#include "./pid.ambigious.c"
 
 double oldAltitude = 0;
 
