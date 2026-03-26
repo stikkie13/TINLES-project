@@ -60,10 +60,16 @@ let centerY = 110;
 let radius = 80;
 
 joy.addEventListener("mousedown", () => dragging = true);
-document.addEventListener("mouseup", () => dragging = false);
+document.addEventListener("mouseup", () => {
+  dragging = false;
+  resetStick();
+});
 
 joy.addEventListener("touchstart", () => dragging = true);
-document.addEventListener("touchend", () => dragging = false);
+document.addEventListener("touchend", () => {
+  dragging = false;
+  resetStick();
+});
 
 let lastUpdate = 0;
 
@@ -100,6 +106,13 @@ function moveStick(clientX, clientY){
   }
 }
 
+function resetStick(){
+  stick.style.left = (centerX - 35) + "px";
+  stick.style.top  = (centerY - 35) + "px";
+
+  fetch("/joystick?angle=0&power=0");
+}
+
 joy.addEventListener("mousemove", function(e){
   if(!dragging) return;
   moveStick(e.clientX, e.clientY);
@@ -121,14 +134,14 @@ void handleRoot() {
 
 void handleJoystick() {
     int angle = server.arg("angle").toInt();
-    int power = server.arg("power").toInt();
+    float power = server.arg("power").toFloat();
 
     float percentage, rollAngle, pitchAngle;
     int totalAngle = 15;
     
     float rad = angle * PI / 180.0;
-    rollAngle  = totalAngle * sin(rad);
-    pitchAngle = -totalAngle * cos(rad);
+    rollAngle  = totalAngle * sin(rad) * power;
+    pitchAngle = -totalAngle * cos(rad) * power;
 
     Serial.print("Pitch: ");
     Serial.print(pitchAngle);
