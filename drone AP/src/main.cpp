@@ -123,14 +123,17 @@ void handleJoystick() {
     int angle = server.arg("angle").toInt();
     int power = server.arg("power").toInt();
 
-    if(angle > 180) {
-        angle -= 360;
-    }
+    float percentage, rollAngle, pitchAngle;
+    int totalAngle = 15;
+    
+    float rad = angle * PI / 180.0;
+    rollAngle  = totalAngle * sin(rad);
+    pitchAngle = -totalAngle * cos(rad);
 
-    Serial.print("Angle: ");
-    Serial.print(angle);
-    Serial.print("  Power: ");
-    Serial.println(power);
+    Serial.print("Pitch: ");
+    Serial.print(pitchAngle);
+    Serial.print("  Roll: ");
+    Serial.println(rollAngle);
 
     server.send(200, "text/plain", "OK");
 }
