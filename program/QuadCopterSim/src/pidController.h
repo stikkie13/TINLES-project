@@ -4,6 +4,12 @@
 #include "./simulator.c"
 #include "./pid.ambigious.c"
 
+// TODO:
+/*
+Set PID weights that ensure all pids on max have at most 1 duty cycle
+Double check if pitch and roll engines are properly synced to absolute gyro
+*/
+
 struct pidStruct rollPid = {
     1,   // Propertional gain constant
     0.1, // Integral gain constant
@@ -20,7 +26,6 @@ struct pidStruct rollPid = {
     0,   // Previous saturated command
     0    // Previous command
 };
-const int rollMask[4] = {1, 0, -1, 0};
 
 struct pidStruct pitchPid = {
     1,   // Propertional gain constant
@@ -38,10 +43,32 @@ struct pidStruct pitchPid = {
     0,   // Previous saturated command
     0    // Previous command
 };
-const int pitchMask[4] = {0, 1, 0, -1};
+
+struct pidStruct altitudePID = {
+    1,   // Propertional gain constant
+    0.1, // Integral gain constant
+    5,   // Derivative gain constant
+    0.1, // Anti-windup constant
+    1,   // Time constant for deprivative filtering
+    Δt,  // Timestep
+    1,   // Max command
+    0,   // Min command
+    40,  // Max rate of change of the command
+    0,   // Integral term
+    0,   // Previous error
+    0,   // Previous derivative
+    0,   // Previous saturated command
+    0    // Previous command
+};
+
+const double rollMask[4] = {1, 0, -1, 0};
+const double pitchMask[4] = {0, 1, 0, -1};
 
 pidNumber rollTarget = 0;
 pidNumber pitchTarget = 0;
+pidNumber altitudeTarget = 5;
+
+extern double state_previous[];
 
 // proportional controller for acro/roll mode.
 // CONTROLLER_P_ACRO calculates the desired rates from the sticks and applies a
@@ -53,18 +80,29 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
 {
     pidNumber motorSpeed[4] = {0.65, 0.68, 0.65, 0.65};
 
+    double *absoluteGyro = &state_previous[5];
+
     // Step
     // {1,0,-1,0}
-    pidNumber rollCommand = PID_Step(&rollPid, gyro[0], rollTarget);
+    pidNumber rollCommand = PID_Step(&rollPid, absoluteGyro[0], rollTarget);
     // {0,1,0,-1}
-    pidNumber pitchCommand = PID_Step(&pitchPid, gyro[1], pitchTarget);
+    pidNumber pitchCommand = PID_Step(&pitchPid, absoluteGyro[1], pitchTarget);
+
+    pidNumber altitudeCommand = PID_Step(&altitudePID, altitude, altitudeTarget);
 
     for (int i = 0; i < 4; i++)
     {
-        duty_cycle[i] = rollCommand * rollMask[i] + pitchCommand * pitchMask[i];
+        duty_cycle[i] = rollCommand * rollMask[i] + pitchCommand * pitchMask[i] + altitudeCommand;
     }
-    printf("roll:%f\t", gyro[0]);
-    printf("pitch:%f\t", gyro[1]);
+    printf("roll:%f\t", absoluteGyro[0]);
+    printf("rollCommand:%f\t", rollCommand);
+
+    printf("pitch:%f\t", absoluteGyro[1]);
+    printf("pitchCommand:%f\t", pitchCommand);
+
+    printf("altitude:%f\t", altitude);
+    printf("altitudeCommand:%f\t", altitudeCommand);
+
     printf("\n");
 }
 

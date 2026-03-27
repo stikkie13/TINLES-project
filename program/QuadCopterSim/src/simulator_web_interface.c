@@ -72,9 +72,9 @@ void randomStartingState()
 {
     state_new[10] = 4.0; // z=0.0
     state_new[16] = 0; // Uz=0
-    state_new[11] = 0.5;  // ϕ=0
-    state_new[12] = 0.5;  // θ=0
-    state_new[13] = 0.5;  // ϕ=0
+    state_new[11] = 0.3;  // ϕ=0
+    state_new[12] = 0.3;  // θ=0
+    state_new[13] = 0.3;  // ϕ=0
     state_new[15] = 0;   // slow down Uy
     state_new[14] = 0;   // slow down Ux
 }
