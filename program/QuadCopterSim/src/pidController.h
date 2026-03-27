@@ -63,7 +63,9 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
     {
         duty_cycle[i] = rollCommand * rollMask[i] + pitchCommand * pitchMask[i];
     }
-    printf("test\n");
+    printf("roll:%f\t", gyro[0]);
+    printf("pitch:%f\t", gyro[1]);
+    printf("\n");
 }
 
 #endif
