@@ -7,7 +7,7 @@
 // TODO:
 /*
 Set PID weights that ensure all pids on max have at most 1 duty cycle
-Double check if pitch and roll engines are properly synced to absolute gyro
+Slow down pids verrryyyyy much
 */
 
 struct pidStruct rollPid = {
@@ -61,8 +61,8 @@ struct pidStruct altitudePID = {
     0    // Previous command
 };
 
-const double rollMask[4] = {1, 0, -1, 0};
-const double pitchMask[4] = {0, 1, 0, -1};
+const double pitchMask[4] = {1, 0, -1, 0};
+const double rollMask[4] = {0, -1, 0, 1};
 
 pidNumber rollTarget = 0;
 pidNumber pitchTarget = 0;
@@ -88,7 +88,10 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
     // {0,1,0,-1}
     pidNumber pitchCommand = PID_Step(&pitchPid, absoluteGyro[1], pitchTarget);
 
-    pidNumber altitudeCommand = PID_Step(&altitudePID, altitude, altitudeTarget);
+    pidNumber altitudeCommand = 0;
+    // PID_Step(&altitudePID, altitude, altitudeTarget);
+
+    state_previous[10] = 4;
 
     for (int i = 0; i < 4; i++)
     {
