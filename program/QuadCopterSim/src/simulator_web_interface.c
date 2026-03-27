@@ -10,8 +10,8 @@
 // #include "simulator.c" // Redundant
 
 // #include "./exampleController.h"
-#include "./standardController.h"
-// #include "./pidController.h"
+// #include "./standardController.h"
+#include "./pidController.h"
 
 double state_new[17];
 double state_previous[17] = {
@@ -68,6 +68,18 @@ double retrieve_simulation_time()
 }
 
 EMSCRIPTEN_KEEPALIVE
+void randomStartingState()
+{
+    state_new[10] = 4.0; // z=0.0
+    state_new[16] = 0; // Uz=0
+    state_new[5] = 1.0;  // ϕ=0
+    state_new[6] = 1.0;  // θ=0
+    state_new[7] = 1.0;  // ϕ=0
+    state_new[15] = 0;   // slow down Uy
+    state_new[14] = 0;   // slow down Ux
+}
+
+EMSCRIPTEN_KEEPALIVE
 void simulate(double tf)
 {
     // printf("Simulation started\n");
@@ -118,6 +130,11 @@ void simulate(double tf)
             }
         }
 
+        if (1)
+        {
+            randomStartingState();
+        }
+
         // update previous state
         for (int j = 0; j < 17; ++j)
         {
@@ -130,7 +147,7 @@ void simulate(double tf)
             gyro[0] = state_new[11];
             gyro[1] = state_new[12];
             gyro[2] = state_new[13];
-            
+
             accel[0] = state_previous[14];
             accel[1] = state_previous[15];
             accel[2] = state_previous[16];

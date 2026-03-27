@@ -3,7 +3,10 @@
 
 #include "./simulator.c"
 
-double oldAltitude = 0;
+// Simulation time is set in "simulator_web_interface"
+extern double simulation_time;
+
+double oldAltitude = 0.1;
 
 // proportional controller for acro/roll mode.
 // CONTROLLER_P_ACRO calculates the desired rates from the sticks and applies a
