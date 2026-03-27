@@ -84,7 +84,8 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
 
     // Step
     // {1,0,-1,0}
-    pidNumber rollCommand = PID_Step(&rollPid, absoluteGyro[0], rollTarget);
+    pidNumber rollCommand = 0;
+    // PID_Step(&rollPid, absoluteGyro[0], rollTarget);
     // {0,1,0,-1}
     pidNumber pitchCommand = PID_Step(&pitchPid, absoluteGyro[1], pitchTarget);
 
