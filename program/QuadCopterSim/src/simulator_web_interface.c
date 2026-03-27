@@ -130,7 +130,7 @@ void simulate(double tf)
             }
         }
 
-        if (1)
+        if (simulation_time<1)
         {
             randomStartingState();
         }
