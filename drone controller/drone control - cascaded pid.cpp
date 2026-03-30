@@ -1,12 +1,16 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include "esp_task_wdt.h"
 
 //Gyro
 const int MPU_addr = 0x68;
 float rollAngle = 0;
 float pitchAngle = 0;
 float alpha = 0.1; // factor for complimentary filter
+const TickType_t period = pdMS_TO_TICKS(10);
 float dt = 0.01;
+
+const int WD_TIMEOUT = 5;
 
 //PID
 double kPAngle = 0.6, kIAngle = 3.5, kDAngle = 0.03;
@@ -108,65 +112,90 @@ void setup() {
   rollAnglePID.integral = 0;
   pitchRatePID.integral = 0; 
   rollRatePID.integral = 0;
+
+  esp_task_wdt_init(WD_TIMEOUT, true); // !! false for debugging
+
+  // Create gyroscopeTask
+  xTaskCreatePinnedToCore(
+    gyroscopeTask,        // Task function
+    "gyroscopeTask",     // Name of the task
+    2048,         // Stack size in words
+    NULL,         // Parameter to pass to the task
+    3,            // Task priority
+    &gyroscopeTaskHandle,  // Task handle
+    1             // Core (0 for communication, 1 for calculations and control)
+  );
+
+  esp_task_wdt_add(gyroscopeTaskHandle);
 }
 
-void loop() {
-  bool newAvg = true;
-  unsigned long startTime = micros(); // for dt calculation
+TaskHandle_t gyroscopeTaskHandle;
+void gyroscopeTask(void *pvParameters) {
+  // ------ Timing ------
+  TickType_t lastWakeTime = xTaskGetTickCount();
 
-  // --- Read accelerometer ---
-  int16_t rawAcX, rawAcY, rawAcZ;
-  float AcX, AcY, AcZ;
-  float roll, pitch;
+  while (true)
+  {
+    bool newAvg = true;
 
-  Wire.beginTransmission(MPU_addr);
-  Wire.write(0x3B);  // first register of accel measurements
-  Wire.endTransmission(false);
-  Wire.requestFrom(MPU_addr, 6, true); // request 6 registers (x, y and z accel)
+    // --- Read accelerometer ---
+    int16_t rawAcX, rawAcY, rawAcZ;
+    float AcX, AcY, AcZ;
+    float roll, pitch;
 
-  if (Wire.available() == 6) {
-    rawAcX = Wire.read() << 8 | Wire.read();  // first read brings highest bits to the left, second fills in the rest with the lower 8 bits
-    rawAcY = Wire.read() << 8 | Wire.read();
-    rawAcZ = Wire.read() << 8 | Wire.read();
-    AcX = (float)rawAcX / 16384.0;  // divide by LSB Sensitivity
-    AcY = (float)rawAcY / 16384.0;
-    AcZ = (float)rawAcZ / 16384.0;
+    Wire.beginTransmission(MPU_addr);
+    Wire.write(0x3B);  // first register of accel measurements
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_addr, 6, true); // request 6 registers (x, y and z accel)
 
-    roll = AcY * 90;
-    pitch = AcX * 90;
-  } 
-  else {
-    newAvg = false;
-  }
+    if (Wire.available() == 6) {
+      rawAcX = Wire.read() << 8 | Wire.read();  // first read brings highest bits to the left, second fills in the rest with the lower 8 bits
+      rawAcY = Wire.read() << 8 | Wire.read();
+      rawAcZ = Wire.read() << 8 | Wire.read();
+      AcX = (float)rawAcX / 16384.0;  // divide by LSB Sensitivity
+      AcY = (float)rawAcY / 16384.0;
+      AcZ = (float)rawAcZ / 16384.0;
 
-  // --- Read gyroscope ---
-  int16_t rawGyX, rawGyY, rawGyZ;
-  float Gx, Gy;
+      roll = AcY * 90;
+      pitch = AcX * 90;
+    } 
+    else {
+      newAvg = false;
+    }
 
-  Wire.beginTransmission(MPU_addr);
-  Wire.write(0x43);  // first register of gyro
-  Wire.endTransmission(false);
-  Wire.requestFrom(MPU_addr, 6, true); // request 6 registers (x, y and z gyro)
+    // --- Read gyroscope ---
+    int16_t rawGyX, rawGyY, rawGyZ;
+    float Gx, Gy;
 
-  if (Wire.available() == 6) {
-    rawGyX = Wire.read() << 8 | Wire.read();  // first read brings highest bits to the left, second fills in the rest with the lower 8 bits
-    rawGyY = Wire.read() << 8 | Wire.read();
-    rawGyZ = Wire.read() << 8 | Wire.read();
+    Wire.beginTransmission(MPU_addr);
+    Wire.write(0x43);  // first register of gyro
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_addr, 6, true); // request 6 registers (x, y and z gyro)
+
+    if (Wire.available() == 6) {
+      rawGyX = Wire.read() << 8 | Wire.read();  // first read brings highest bits to the left, second fills in the rest with the lower 8 bits
+      rawGyY = Wire.read() << 8 | Wire.read();
+      rawGyZ = Wire.read() << 8 | Wire.read();
     
-    Gx = rawGyX / 131.0;  // convert to deg/s
-    Gy = rawGyY / 131.0;
-  } 
-  else {
-    newAvg = false;
+      Gx = rawGyX / 131.0;  // convert to deg/s
+      Gy = rawGyY / 131.0;
+    } 
+    else {
+      newAvg = false;
+    }
+
+    if (newAvg) {
+      newAverage(roll, pitch, Gx, Gy);
+    }
+
+    // --- Stabilisation ---
+    stabilize(Gx, Gy);
+
+    // Feed the watchdog
+    esp_task_wdt_reset();
+
+    vTaskDelayUntil(&lastWakeTime, period);
   }
-
-  if (newAvg) {
-    newAverage(roll, pitch, Gx, Gy);
-  }
-
-  // --- Stabilisation ---
-  stabilize(Gx, Gy);
-
-  unsigned long elapsed = micros() - startTime;
-  dt = elapsed / 1000000.0; // Update dt dynamically
 }
+
+void loop() {}
