@@ -133,7 +133,7 @@ void simulate(double tf)
         if (simulation_time < 1)
         {
             // randomStartingState();
-            state_new[12] = 0.3; // θ=0
+            state_new[12] = 0.9; // θ=0
         }
 
         // update previous state
