@@ -18,7 +18,7 @@ struct pidStruct rollPid = {
     1,   // Time constant for deprivative filtering
     Δt,  // Timestep
     1,   // Max command
-    0,   // Min command
+    -1,   // Min command
     40,  // Max rate of change of the command
     0,   // Integral term
     0,   // Previous error
@@ -28,14 +28,14 @@ struct pidStruct rollPid = {
 };
 
 struct pidStruct pitchPid = {
-    1,   // Propertional gain constant
+    0.1,   // Propertional gain constant
     0.1, // Integral gain constant
-    5,   // Derivative gain constant
+    0,   // Derivative gain constant
     0.1, // Anti-windup constant
     1,   // Time constant for deprivative filtering
     Δt,  // Timestep
     1,   // Max command
-    0,   // Min command
+    -1,   // Min command
     40,  // Max rate of change of the command
     0,   // Integral term
     0,   // Previous error
