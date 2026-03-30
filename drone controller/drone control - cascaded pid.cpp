@@ -8,6 +8,7 @@ float rollAngle = 0;
 float pitchAngle = 0;
 float alpha = 0.1; // factor for complimentary filter
 const TickType_t period = pdMS_TO_TICKS(10);
+TaskHandle_t gyroscopeTaskHandle;
 float dt = 0.01;
 
 const int WD_TIMEOUT = 5;
@@ -129,7 +130,6 @@ void setup() {
   esp_task_wdt_add(gyroscopeTaskHandle);
 }
 
-TaskHandle_t gyroscopeTaskHandle;
 void gyroscopeTask(void *pvParameters) {
   // ------ Timing ------
   TickType_t lastWakeTime = xTaskGetTickCount();
