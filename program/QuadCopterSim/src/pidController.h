@@ -51,8 +51,8 @@ struct pidStruct pitchPid = {
 };
 
 struct pidStruct altitudePID = {
-    0.2,   // Propertional gain constant
-    0.025, // Integral gain constant
+    0.3,   // Propertional gain constant
+    0.045, // Integral gain constant
     0.20,  // Derivative gain constant
     0,     // Anti-windup constant
     1,     // Time constant for deprivative filtering
@@ -100,7 +100,7 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
 
     for (int i = 0; i < 4; i++)
     {
-        duty_cycle[i] = rollCommand * rollMask[i] * 0.2 + pitchCommand * pitchMask[i] * 0.2 + altitudeCommand * 1;
+        duty_cycle[i] = rollCommand * rollMask[i] + pitchCommand * pitchMask[i] + altitudeCommand * 1;
     }
     printf("roll:%f\t", absoluteGyro[0]);
     printf("rollCommand:%f\t", rollCommand);
