@@ -10,55 +10,61 @@ Set PID weights that ensure all pids on max have at most 1 duty cycle
 Slow down pids verrryyyyy much
 */
 
+void setAltitude(double altitude);
+
+#define orrientationPropertionalGain 0.025
+#define orrientationIntegralGain 0.025
+#define orrientationDerivatigeGain 0.5
+
 struct pidStruct rollPid = {
-    1,   // Propertional gain constant
-    0.1, // Integral gain constant
-    5,   // Derivative gain constant
-    0.1, // Anti-windup constant
-    1,   // Time constant for deprivative filtering
-    Δt,  // Timestep
-    1,   // Max command
-    -1,  // Min command
-    40,  // Max rate of change of the command
-    0,   // Integral term
-    0,   // Previous error
-    0,   // Previous derivative
-    0,   // Previous saturated command
-    0    // Previous command
+    orrientationPropertionalGain, // Propertional gain constant
+    orrientationIntegralGain,     // Integral gain constant
+    orrientationDerivatigeGain,   // Derivative gain constant
+    0,                            // Anti-windup constant
+    1,                            // Time constant for deprivative filtering
+    Δt,                           // Timestep
+    1,                            // Max command
+    -1,                           // Min command
+    40,                           // Max rate of change of the command
+    0,                            // Integral term
+    0,                            // Previous error
+    0,                            // Previous derivative
+    0,                            // Previous saturated command
+    0                             // Previous command
 };
 
 struct pidStruct pitchPid = {
-    0.1,  // Propertional gain constant
-    0.025, // Integral gain constant
-    0.80,  // Derivative gain constant
-    0,    // Anti-windup constant
-    1,    // Time constant for deprivative filtering
-    Δt,   // Timestep
-    1,    // Max command
-    -1,   // Min command
-    40,   // Max rate of change of the command
-    0,    // Integral term
-    0,    // Previous error
-    0,    // Previous derivative
-    0,    // Previous saturated command
-    0     // Previous command
+    orrientationPropertionalGain, // Propertional gain constant
+    orrientationIntegralGain,     // Integral gain constant
+    orrientationDerivatigeGain,   // Derivative gain constant
+    0,                            // Anti-windup constant
+    1,                            // Time constant for deprivative filtering
+    Δt,                           // Timestep
+    1,                            // Max command
+    -1,                           // Min command
+    40,                           // Max rate of change of the command
+    0,                            // Integral term
+    0,                            // Previous error
+    0,                            // Previous derivative
+    0,                            // Previous saturated command
+    0                             // Previous command
 };
 
 struct pidStruct altitudePID = {
-    1,   // Propertional gain constant
-    0.1, // Integral gain constant
-    5,   // Derivative gain constant
-    0.1, // Anti-windup constant
-    1,   // Time constant for deprivative filtering
-    Δt,  // Timestep
-    1,   // Max command
-    0,   // Min command
-    40,  // Max rate of change of the command
-    0,   // Integral term
-    0,   // Previous error
-    0,   // Previous derivative
-    0,   // Previous saturated command
-    0    // Previous command
+    0.2,   // Propertional gain constant
+    0.025, // Integral gain constant
+    0.20,  // Derivative gain constant
+    0,     // Anti-windup constant
+    1,     // Time constant for deprivative filtering
+    Δt,    // Timestep
+    1,     // Max command
+    0,    // Min command
+    40,    // Max rate of change of the command
+    0,     // Integral term
+    0,     // Previous error
+    0,     // Previous derivative
+    0,     // Previous saturated command
+    0      // Previous command
 };
 
 const double pitchMask[4] = {1, 0, -1, 0};
@@ -78,25 +84,23 @@ extern double state_previous[];
 // Gyro XYZ rot?
 void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], double accel[3], double altitude)
 {
-    pidNumber motorSpeed[4] = {0.65, 0.68, 0.65, 0.65};
+    // pidNumber motorSpeed[4] = {0.65, 0.68, 0.65, 0.65};
 
     double *absoluteGyro = &state_previous[5];
 
     // Step
     // {1,0,-1,0}
-    pidNumber rollCommand = 0;
-    // PID_Step(&rollPid, absoluteGyro[0], rollTarget);
+    pidNumber rollCommand = PID_Step(&rollPid, absoluteGyro[0], rollTarget);
     // {0,1,0,-1}
     pidNumber pitchCommand = PID_Step(&pitchPid, absoluteGyro[1], pitchTarget);
 
-    pidNumber altitudeCommand = 0;
-    // PID_Step(&altitudePID, altitude, altitudeTarget);
+    pidNumber altitudeCommand = PID_Step(&altitudePID, altitude, altitudeTarget);
 
-    state_previous[10] = 4;
+    // setAltitude(4);
 
     for (int i = 0; i < 4; i++)
     {
-        duty_cycle[i] = rollCommand * rollMask[i] + pitchCommand * pitchMask[i] + altitudeCommand;
+        duty_cycle[i] = rollCommand * rollMask[i] * 0.2 + pitchCommand * pitchMask[i] * 0.2 + altitudeCommand * 1;
     }
     printf("roll:%f\t", absoluteGyro[0]);
     printf("rollCommand:%f\t", rollCommand);
@@ -110,4 +114,8 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
     printf("\n");
 }
 
+void setAltitude(double altitude)
+{
+    state_previous[10] = altitude; // Altitude lock
+}
 #endif
