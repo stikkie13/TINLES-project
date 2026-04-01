@@ -312,7 +312,7 @@ void gyroscopeTask(void *pvParameters) {
   }
 }
 
-void sleepAndAPControl() {
+void sleepAndAPControl(void *pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   while(1){
