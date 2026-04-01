@@ -1,3 +1,10 @@
 ..obsidian
 .obsidian/workspace.json
 .obsidian/hotkeys.json
+
+# Platform IO
+.pio
+.vscode/c_cpp_properties.json
+.vscode/extensions.json
+.vscode/launch.json
+..vscode/*
