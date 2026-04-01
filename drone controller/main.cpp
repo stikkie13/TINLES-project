@@ -7,10 +7,27 @@ const TickType_t period = pdMS_TO_TICKS(50);
 
 const int WD_TIMEOUT = 5;
 
+void gyroscopeTask(void *pvParameters) {
+  // ------ Timing ------
+  TickType_t lastWakeTime = xTaskGetTickCount();
+
+  int counter = 0;
+
+  while (true)
+  {
+    counter++;
+
+    // Pet the watchdog
+    esp_task_wdt_reset();
+
+    vTaskDelayUntil(&lastWakeTime, period);
+  }
+}
+
 void setup() {
   Serial.begin(115200);
 
-  esp_task_wdt_init(WD_TIMEOUT, false); // !! false for debugging
+  esp_task_wdt_init(WD_TIMEOUT, true); // !! false for debugging
 
   // Create gyroscopeTask
   xTaskCreatePinnedToCore(
@@ -24,21 +41,6 @@ void setup() {
   );
 
   esp_task_wdt_add(gyroscopeTaskHandle);
-}
-
-void gyroscopeTask(void *pvParameters) {
-  // ------ Timing ------
-  TickType_t lastWakeTime = xTaskGetTickCount();
-
-  while (true)
-  {
-    Serial.printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
-    // Feed the watchdog
-    esp_task_wdt_reset();
-
-    vTaskDelayUntil(&lastWakeTime, period);
-  }
 }
 
 void loop() {}
