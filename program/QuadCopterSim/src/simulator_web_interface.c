@@ -25,7 +25,7 @@ double state_previous[17] = {
     0.0,              // yaw angle ψ (rad)
     0.0,              // position x (m)
     0.0,              // position y (m)
-    0.1,              // altitude z (m)
+    0.1,              // altitude z (m)           //10
     0.0,              // roll rate ∂ϕ/∂t (rad/s)
     0.0,              // pitch rate ∂θ/∂t (rad/s)
     0.0,              // yaw rate ∂ψ/∂t (rad/s)
@@ -65,6 +65,18 @@ EMSCRIPTEN_KEEPALIVE
 double retrieve_simulation_time()
 {
     return simulation_time;
+}
+
+EMSCRIPTEN_KEEPALIVE
+void randomStartingState()
+{
+    state_new[10] = 4.0; // z=0.0
+    state_new[16] = 0;   // Uz=0
+    state_new[11] = 0.3; // ϕ=0
+    state_new[12] = 0.3; // θ=0
+    state_new[13] = 0.3; // ϕ=0
+    state_new[15] = 0;   // slow down Uy
+    state_new[14] = 0;   // slow down Ux
 }
 
 EMSCRIPTEN_KEEPALIVE
@@ -118,6 +130,11 @@ void simulate(double tf)
             }
         }
 
+        if (simulation_time < 1)
+        {
+            randomStartingState();
+        }
+
         // update previous state
         for (int j = 0; j < 17; ++j)
         {
@@ -130,7 +147,7 @@ void simulate(double tf)
             gyro[0] = state_new[11];
             gyro[1] = state_new[12];
             gyro[2] = state_new[13];
-            
+
             accel[0] = state_previous[14];
             accel[1] = state_previous[15];
             accel[2] = state_previous[16];

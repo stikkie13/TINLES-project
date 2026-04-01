@@ -7,8 +7,9 @@ We need:
     Motor output
 
 # Up next
-programming in a PID controller
+Random rotation values between -40 and 40 for each of pitch yaw and roll. And starting at a set height
  Reading HTML values for PID settings
+ Loop gyro values between -180 and 180
 # Reading from the sensors
 ## Altitude
 [10]
