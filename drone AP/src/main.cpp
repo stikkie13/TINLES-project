@@ -8,6 +8,11 @@
 #include <WiFi.h>
 #include <WebServer.h>
 
+#define button 32
+#define interrupt_button_gpio GPIO_NUM_32
+
+RTC_DATA_ATTR int bootCount = 0;
+
 const char *ssid = "ESP32S3-AP";
 const char *password = "embeddedgroup4";
 
@@ -148,14 +153,32 @@ void handleJoystick() {
 
 void handleOFF() {
   Serial.println("OFF");
-
   handleRoot();
+  Serial.println("drone asleep (handleOFF())");
+  esp_deep_sleep_start();
 }
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-
+  pinMode(button, INPUT_PULLUP);
+  
   Serial.begin(115200);
+
+  bootCount++;
+  Serial.println("Boot number: " + String(bootCount));
+
+  esp_sleep_enable_ext0_wakeup(interrupt_button_gpio, LOW);
+
+  esp_sleep_wakeup_cause_t wakeup_reason;
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+  if(bootCount == 1 || wakeup_reason != ESP_SLEEP_WAKEUP_EXT0) {
+    Serial.println("drone asleep (setup())");
+    esp_deep_sleep_start();
+  }
+
+  while(digitalRead(button) == LOW) {
+    delay(100);
+  }
+  Serial.println("drone awake");
 
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
@@ -172,4 +195,12 @@ void setup() {
 
 void loop() {
   server.handleClient();
+
+  if(digitalRead(button) == LOW) {
+    while(digitalRead(button) == LOW) {
+        delay(100);
+    }
+    Serial.println("drone asleep (loop())");
+    esp_deep_sleep_start();
+  }
 }
