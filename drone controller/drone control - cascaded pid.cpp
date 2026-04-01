@@ -9,8 +9,6 @@ const int MPU_addr = 0x68;
 float rollAngle = 0;
 float pitchAngle = 0;
 float alpha = 0.1; // factor for complimentary filter
-const TickType_t period = pdMS_TO_TICKS(10);
-TaskHandle_t gyroscopeTaskHandle;
 float dt = 0.01;
 
 const int WD_TIMEOUT = 5;
@@ -18,6 +16,79 @@ const int WD_TIMEOUT = 5;
 // PID
 double kPAngle = 0.6, kIAngle = 3.5, kDAngle = 0.03;
 double kPRate = 2, kIRate = 12, kDRate = 0;
+
+TaskHandle_t gyroscopeTaskHandle;
+const TickType_t period = pdMS_TO_TICKS(50);
+
+const int WD_TIMEOUT = 5;
+
+void gyroscopeTask(void *pvParameters) {
+  // ------ Timing ------
+  TickType_t lastWakeTime = xTaskGetTickCount();
+
+  while (true)
+  {
+    bool newAvg = true;
+
+    // --- Read accelerometer ---
+    int16_t rawAcX, rawAcY, rawAcZ;
+    float AcX, AcY, AcZ;
+    float roll, pitch;
+
+    Wire.beginTransmission(MPU_addr);
+    Wire.write(0x3B);  // first register of accel measurements
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_addr, 6, true); // request 6 registers (x, y and z accel)
+
+    if (Wire.available() == 6) {
+      rawAcX = Wire.read() << 8 | Wire.read();  // first read brings highest bits to the left, second fills in the rest with the lower 8 bits
+      rawAcY = Wire.read() << 8 | Wire.read();
+      rawAcZ = Wire.read() << 8 | Wire.read();
+      AcX = (float)rawAcX / 16384.0;  // divide by LSB Sensitivity
+      AcY = (float)rawAcY / 16384.0;
+      AcZ = (float)rawAcZ / 16384.0;
+
+      roll = AcY * 90;
+      pitch = AcX * 90;
+    } 
+    else {
+      newAvg = false;
+    }
+
+    // --- Read gyroscope ---
+    int16_t rawGyX, rawGyY, rawGyZ;
+    float Gx, Gy;
+
+    Wire.beginTransmission(MPU_addr);
+    Wire.write(0x43);  // first register of gyro
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU_addr, 6, true); // request 6 registers (x, y and z gyro)
+
+    if (Wire.available() == 6) {
+      rawGyX = Wire.read() << 8 | Wire.read();  // first read brings highest bits to the left, second fills in the rest with the lower 8 bits
+      rawGyY = Wire.read() << 8 | Wire.read();
+      rawGyZ = Wire.read() << 8 | Wire.read();
+    
+      Gx = rawGyX / 131.0;  // convert to deg/s
+      Gy = rawGyY / 131.0;
+    } 
+    else {
+      newAvg = false;
+    }
+
+    if (newAvg) {
+      newAverage(roll, pitch, Gx, Gy);
+    }
+
+    // --- Stabilisation ---
+    stabilize(Gx, Gy);
+
+    // Feed the watchdog
+    esp_task_wdt_reset();
+
+    vTaskDelayUntil(&lastWakeTime, period);
+  }
+}
 
 struct PIDReturn {
   double PID;
