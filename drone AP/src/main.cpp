@@ -1,8 +1,7 @@
 /*
   https://www.youtube.com/watch?v=3T1tnY2_NpI
   https://www.instructables.com/Making-a-Joystick-With-HTML-pure-JavaScript/
-
-  192.168.4.1
+  https://www.cssscript.com/touch-virtual-joystick/
 */
 
 #include <Arduino.h>
@@ -16,158 +15,161 @@ WebServer server(80);
 
 const char* htmlPage = R"rawliteral(
 <!DOCTYPE html>
-<html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-body { text-align: center; font-family: Arial; }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
 
-#joy {
-  width: 220px;
-  height: 220px;
-  background: lightgray;
-  border-radius: 50%;
-  position: relative;
-  margin: auto;
-  touch-action: none;
-}
+    #joystickContainer {
+      width: 200px;
+      height: 200px;
+      background: #ddd;
+      border-radius: 50%;
+      position: relative;
+      margin: 20px auto;
+      touch-action: none;
+    }
 
-#stick {
-  width: 70px;
-  height: 70px;
-  background: gray;
-  border-radius: 50%;
-  position: absolute;
-  left: 75px;
-  top: 75px;
-}
-</style>
+    #stick {
+      width: 80px;
+      height: 80px;
+      background: #555;
+      border-radius: 50%;
+      position: absolute;
+      top: 60px;
+      left: 60px;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
 
-<div id="joy">
-  <div id="stick"></div>
-</div>
+  <div id="joystickContainer">
+    <div id="stick"></div>
+  </div>
 
-<script>
-let joy = document.getElementById("joy");
-let stick = document.getElementById("stick");
+  <button onclick="location.href='/OFF'">OFF</button>
 
-let dragging = false;
-let centerX = 110;
-let centerY = 110;
-let radius = 80;
+  <p id="output">X: 0 | Y: 0</p>
 
-joy.addEventListener("mousedown", () => dragging = true);
-document.addEventListener("mouseup", () => {
-  dragging = false;
-  resetStick();
-});
+  <script>
+    const stick = document.getElementById("stick");
+    const container = document.getElementById("joystickContainer");
+    const output = document.getElementById("output");
 
-joy.addEventListener("touchstart", () => dragging = true);
-document.addEventListener("touchend", () => {
-  dragging = false;
-  resetStick();
-});
+    let dragging = false;
 
-let lastUpdate = 0;
+    container.addEventListener("mousedown", start);
+    container.addEventListener("touchstart", start);
 
-function moveStick(clientX, clientY){
-  let rect = joy.getBoundingClientRect();
-  let x = clientX - rect.left;
-  let y = clientY - rect.top;
+    document.addEventListener("mousemove", move);
+    document.addEventListener("touchmove", move);
 
-  let dx = x - centerX;
-  let dy = y - centerY;
+    document.addEventListener("mouseup", end);
+    document.addEventListener("touchend", end);
 
-  let dist = Math.sqrt(dx*dx + dy*dy);
-  if(dist > radius){
-    dx = dx * radius / dist;
-    dy = dy * radius / dist;
-    dist = radius;
-  }
+    function start(e) {
+      dragging = true;
+    }
 
-  let stickX = centerX + dx;
-  let stickY = centerY + dy;
+    let lastUpdate = 0;
 
-  stick.style.left = (stickX - 35) + "px";
-  stick.style.top = (stickY - 35) + "px";
+    function move(e) {
+      if (!dragging) return;
 
-  // 0 graden boven
-  let angle = Math.atan2(dx, -dy) * 180 / Math.PI;
-  if(angle < 0) angle += 360;
+      let rect = container.getBoundingClientRect();
+      let x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      let y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
 
-  let power = dist / radius;
+      let centerX = rect.width / 2;
+      let centerY = rect.height / 2;
 
-  if(Date.now() - lastUpdate > 50) {
-    fetch("/joystick?angle=" + Math.round(angle) + "&power=" + power.toFixed(2));
-    lastUpdate = Date.now();
-  }
-}
+      let dx = x - centerX;
+      let dy = y - centerY;
 
-function resetStick(){
-  stick.style.left = (centerX - 35) + "px";
-  stick.style.top  = (centerY - 35) + "px";
+      let max = 60;
+      let distance = Math.sqrt(dx * dx + dy * dy);
 
-  fetch("/joystick?angle=0&power=0");
-}
+      if (distance > max) {
+        dx = (dx / distance) * max;
+        dy = (dy / distance) * max;
+      }
 
-joy.addEventListener("mousemove", function(e){
-  if(!dragging) return;
-  moveStick(e.clientX, e.clientY);
-});
+      stick.style.left = (centerX + dx - 40) + "px";
+      stick.style.top = (centerY + dy - 40) + "px";
 
-joy.addEventListener("touchmove", function(e){
-  if(!dragging) return;
-  moveStick(e.touches[0].clientX, e.touches[0].clientY);
-});
-</script>
+      dx = dx / 4;
+      dy = dy / 4;
+
+      output.innerText = `X: ${Math.round(dx)} | Y: ${Math.round(dy)}`;
+
+      if(Date.now() - lastUpdate > 50) {
+        fetch("/joystick?angleX=" + Math.round(dx) + "&angleY=" + Math.round(dy));
+        lastUpdate = Date.now();
+      }
+    }
+
+    function end() {
+      dragging = false;
+      stick.style.left = "60px";
+      stick.style.top = "60px";
+      output.innerText = "X: 0 | Y: 0";
+
+      fetch("/joystick?angleX=" + 0 + "&angleY=" + 0);
+    }
+  </script>
 
 </body>
 </html>
 )rawliteral";
 
 void handleRoot() {
-    server.send(200, "text/html", htmlPage);
+  server.send(200, "text/html", htmlPage);
 }
 
 void handleJoystick() {
-    int angle = server.arg("angle").toInt();
-    float power = server.arg("power").toFloat();
+  int roll = server.arg("angleX").toInt();
+  int pitch = server.arg("angleY").toInt();
 
-    float percentage, rollAngle, pitchAngle;
-    int totalAngle = 15;
-    
-    float rad = angle * PI / 180.0;
-    rollAngle  = totalAngle * sin(rad) * power;
-    pitchAngle = -totalAngle * cos(rad) * power;
+  Serial.print(roll);
+  Serial.print(", ");
+  Serial.println(pitch);
 
-    Serial.print("Pitch: ");
-    Serial.print(pitchAngle);
-    Serial.print("  Roll: ");
-    Serial.println(rollAngle);
+  handleRoot();
+}
 
-    server.send(200, "text/plain", "OK");
+void handleOFF() {
+  Serial.println("OFF");
+
+  handleRoot();
 }
 
 void setup() {
-    pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
-    Serial.begin(115200);
+  Serial.begin(115200);
 
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(ssid, password);
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP(ssid, password);
 
-    Serial.print("IP address: ");
-    Serial.println(WiFi.softAPIP());
+  Serial.print("IP address: ");
+  Serial.println(WiFi.softAPIP());
 
-    server.on("/", handleRoot);
-    server.on("/joystick", handleJoystick);
+  server.on("/", handleRoot);
+  server.on("/joystick", handleJoystick);
+  server.on("/OFF", handleOFF);
 
-    server.begin();
+  server.begin();
 }
 
 void loop() {
-    server.handleClient();
+  server.handleClient();
 }
