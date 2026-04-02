@@ -181,6 +181,7 @@ void handleJoystick() {
 
 void handleOFF() {
   Serial.println("drone asleep (handleOFF())");
+  server.close();
   esp_deep_sleep_start();
 }
 
@@ -229,19 +230,19 @@ void stabilize(float Gx, float Gy) {
   // --- apply to motors ---
 
   // -- prints ---
-  Serial.print("Roll: ");
-  Serial.print(rollAngle);
-  Serial.print(" | Pitch: ");
-  Serial.println(pitchAngle);
+//   Serial.print("Roll: ");
+//   Serial.print(rollAngle);
+//   Serial.print(" | Pitch: ");
+//   Serial.println(pitchAngle);
   
-  Serial.print("NE: ");
-  Serial.print(motorInputNE);
-  Serial.print(" | SE: ");
-  Serial.print(motorInputSE);
-  Serial.print(" | SW: ");
-  Serial.print(motorInputSW);
-  Serial.print(" | NW: ");
-  Serial.println(motorInputNW);
+//   Serial.print("NE: ");
+//   Serial.print(motorInputNE);
+//   Serial.print(" | SE: ");
+//   Serial.print(motorInputSE);
+//   Serial.print(" | SW: ");
+//   Serial.print(motorInputSW);
+//   Serial.print(" | NW: ");
+//   Serial.println(motorInputNW);
 }
 
 void gyroscopeTask(void *pvParameters) {
@@ -305,7 +306,7 @@ void gyroscopeTask(void *pvParameters) {
     // --- Stabilisation ---
     stabilize(Gx, Gy);
 
-    // Feed the watchdog
+    // Pet the watchdog
     esp_task_wdt_reset();
 
     vTaskDelayUntil(&lastWakeTime, period);
@@ -393,19 +394,19 @@ void setup() {
 
   // Create gyroscopeTask
   xTaskCreatePinnedToCore(
-    gyroscopeTask,        // Task function
-    "gyroscopeTask",     // Name of the task
-    2048,         // Stack size in words
-    NULL,         // Parameter to pass to the task
-    3,            // Task priority
-    &gyroscopeTaskHandle,  // Task handle
-    1             // Core (0 for communication, 1 for calculations and control)
+    gyroscopeTask,          // Task function
+    "gyroscopeTask",        // Name of the task
+    2048,                   // Stack size in words
+    NULL,                   // Parameter to pass to the task
+    3,                      // Task priority
+    &gyroscopeTaskHandle,   // Task handle
+    1                       // Core (0 for communication, 1 for calculations and control)
   );
 
   xTaskCreatePinnedToCore(
     sleepAndAPControl,
     "sleepAndAPTaskHandle",
-    2048,
+    8192,
     NULL,
     2,
     &sleepAndAPTaskHandle,
