@@ -1,3 +1,9 @@
+/*
+TO DO
+- integrate motors
+- 
+*/
+
 #include <Arduino.h>
 #include <Wire.h>
 #include "esp_task_wdt.h"
@@ -174,7 +180,8 @@ void handleJoystick() {
   Serial.print(", ");
   Serial.println(pitch);
 
-  // send to desired angle
+  targetPitch = pitch;
+  targetRoll = roll;
 
   handleRoot();
 }
