@@ -211,11 +211,11 @@ PIDReturn PID(double target, double current, double integral, double lastError, 
 }
 
 void stabilize(float Gx, float Gy) {
-  // --- outer PIDs for Pitch & Roll ---
+  // outer PIDs for Pitch & Roll
   pitchAnglePID = PID(targetPitch, pitchAngle, pitchAnglePID.integral, pitchAnglePID.lastError, kPAngle, kIAngle, kDAngle);
   rollAnglePID = PID(targetRoll, rollAngle, rollAnglePID.integral, rollAnglePID.lastError, kPAngle, kIAngle, kDAngle);
 
-  // --- inner PIDs for Pitch & Roll ---
+  // inner PIDs for Pitch & Roll
   pitchRatePID = PID(pitchAnglePID.PID, Gy, pitchRatePID.integral, pitchRatePID.lastError, kPRate, kIRate, kDRate);
   rollRatePID = PID(rollAnglePID.PID, Gx, rollRatePID.integral, rollRatePID.lastError, kPRate, kIRate, kDRate);
 
@@ -223,7 +223,7 @@ void stabilize(float Gx, float Gy) {
   Single PID for Yaw and Altitude
   */
 
-  // --- calculate motor inputs ---
+  // calculate motor inputs
   motorInputNE = (hover - rollRatePID.PID + pitchRatePID.PID); // front right - counter clockwise
   motorInputSE = (hover - rollRatePID.PID - pitchRatePID.PID); // rear right - clockwise
   motorInputSW = (hover + rollRatePID.PID - pitchRatePID.PID); // rear left  - counter clockwise
@@ -234,9 +234,8 @@ void stabilize(float Gx, float Gy) {
   motorInputSW = constrain(motorInputSW, 1000, 2000);
   motorInputNW = constrain(motorInputNW, 1000, 2000);
 
-  // --- apply to motors ---
+  // apply to motors
 
-  // -- prints ---
 //   Serial.print("Roll: ");
 //   Serial.print(rollAngle);
 //   Serial.print(" | Pitch: ");
@@ -253,14 +252,14 @@ void stabilize(float Gx, float Gy) {
 }
 
 void gyroscopeTask(void *pvParameters) {
-  // ------ Timing ------
+  // Timing
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   while (true)
   {
     bool newAvg = true;
 
-    // --- Read accelerometer ---
+    // Read accelerometer
     int16_t rawAcX, rawAcY, rawAcZ;
     float AcX, AcY, AcZ;
     float roll, pitch;
@@ -285,7 +284,7 @@ void gyroscopeTask(void *pvParameters) {
       newAvg = false;
     }
 
-    // --- Read gyroscope ---
+    // Read gyroscope
     int16_t rawGyX, rawGyY, rawGyZ;
     float Gx, Gy;
 
@@ -310,7 +309,7 @@ void gyroscopeTask(void *pvParameters) {
       newAverage(roll, pitch, Gx, Gy);
     }
 
-    // --- Stabilisation ---
+    // Stabilisation
     stabilize(Gx, Gy);
 
     // Pet the watchdog
@@ -341,7 +340,7 @@ void sleepAndAPControl(void *pvParameters) {
 }
 
 void setup() {
-  //Sleep
+  // Sleep
   pinMode(button, INPUT_PULLUP);
 
   bootCount++;
@@ -360,7 +359,7 @@ void setup() {
   }
   Serial.println("drone awake");
 
-  //AP
+  // AP
   WiFi.mode(WIFI_AP);
   WiFi.softAP(ssid, password);
 
@@ -373,7 +372,7 @@ void setup() {
 
   server.begin();
 
-  //Wire
+  // Wire
   Wire.begin();
   Wire.beginTransmission(MPU_addr);
   Wire.write(0x6B);  // select PWR_MGMT_1 register
@@ -410,6 +409,7 @@ void setup() {
     1                       // Core (0 for communication, 1 for calculations and control)
   );
 
+  // Create sleep and AP task
   xTaskCreatePinnedToCore(
     sleepAndAPControl,
     "sleepAndAPTaskHandle",
@@ -420,6 +420,7 @@ void setup() {
     0
   );
 
+  // Enable watchdog for both tasks
   esp_task_wdt_add(gyroscopeTaskHandle);
   esp_task_wdt_add(sleepAndAPTaskHandle);
 }
