@@ -1,7 +1,9 @@
 /*
 TO DO
 - integrate motors
-- 
+- yaw PID ?
+- measure height ?
+- height PID ?
 */
 
 #include <Arduino.h>
