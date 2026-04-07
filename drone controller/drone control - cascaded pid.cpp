@@ -213,11 +213,11 @@ PIDReturn PID(double target, double current, double integral, double lastError, 
 }
 
 void stabilize(float Gx, float Gy) {
-  // outer PIDs for Pitch & Roll
+  // outer PIDs for Pitch & Roll: Desired angle -> desired rotation speed
   pitchAnglePID = PID(targetPitch, pitchAngle, pitchAnglePID.integral, pitchAnglePID.lastError, kPAngle, kIAngle, kDAngle);
   rollAnglePID = PID(targetRoll, rollAngle, rollAnglePID.integral, rollAnglePID.lastError, kPAngle, kIAngle, kDAngle);
 
-  // inner PIDs for Pitch & Roll
+  // inner PIDs for Pitch & Roll: Desired rotation speed -> motor input
   pitchRatePID = PID(pitchAnglePID.PID, Gy, pitchRatePID.integral, pitchRatePID.lastError, kPRate, kIRate, kDRate);
   rollRatePID = PID(rollAnglePID.PID, Gx, rollRatePID.integral, rollRatePID.lastError, kPRate, kIRate, kDRate);
 
@@ -360,6 +360,7 @@ void setup() {
     delay(100);
   }
   Serial.println("drone awake");
+  delay(3000);
 
   // AP
   WiFi.mode(WIFI_AP);
