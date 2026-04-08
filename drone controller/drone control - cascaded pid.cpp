@@ -174,7 +174,7 @@ void handleRoot() {
   server.send(200, "text/html", htmlPage);
 }
 
-void handleJoystick() {
+void joystickInterrupt() {
   int roll = server.arg("angleX").toInt();
   int pitch = server.arg("angleY").toInt();
 
@@ -188,7 +188,7 @@ void handleJoystick() {
   handleRoot();
 }
 
-void handleOFF() {
+void OFFInterrupt() {
   Serial.println("drone asleep (handleOFF())");
   server.close();
   esp_deep_sleep_start();
@@ -370,8 +370,8 @@ void setup() {
   Serial.println(WiFi.softAPIP());
 
   server.on("/", handleRoot);
-  server.on("/joystick", handleJoystick);
-  server.on("/OFF", handleOFF);
+  server.on("/joystick", joystickInterrupt);
+  server.on("/OFF", OFFInterrupt);
 
   server.begin();
 
