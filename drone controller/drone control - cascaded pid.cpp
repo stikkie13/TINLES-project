@@ -1,6 +1,6 @@
 /*
 TO DO
-- integrate motors
+- juiste pins voor de motoren
 - yaw PID ?
 - measure height ?
 - height PID ?
@@ -11,6 +11,16 @@ TO DO
 #include "esp_task_wdt.h"
 #include <WiFi.h>
 #include <WebServer.h>
+
+// Motors
+#define motorPinNW 1 // dummy values voor de pins
+#define motorChannelNW 0
+#define motorPinNE 2
+#define motorChannelNE 1
+#define motorPinSE 3
+#define motorChannelSE 2
+#define motorPinSW 4
+#define motorChannelSW 3
 
 // Gyro
 const int MPU_addr = 0x68;
@@ -36,7 +46,7 @@ struct PIDReturn {
 PIDReturn pitchAnglePID, rollAnglePID, pitchRatePID, rollRatePID;
 double targetPitch = 0, targetRoll = 0;
 
-int hover = 1150;
+int hover = 150;
 int motorInputNW, motorInputNE, motorInputSE, motorInputSW;
 
 // AP
@@ -226,17 +236,21 @@ void stabilize(float Gx, float Gy) {
   */
 
   // calculate motor inputs
+  motorInputNW = (hover + rollRatePID.PID + pitchRatePID.PID); // front left - clockwise
   motorInputNE = (hover - rollRatePID.PID + pitchRatePID.PID); // front right - counter clockwise
   motorInputSE = (hover - rollRatePID.PID - pitchRatePID.PID); // rear right - clockwise
   motorInputSW = (hover + rollRatePID.PID - pitchRatePID.PID); // rear left  - counter clockwise
-  motorInputNW = (hover + rollRatePID.PID + pitchRatePID.PID); // front left - clockwise
 
-  motorInputNE = constrain(motorInputNE, 1000, 2000);
-  motorInputSE = constrain(motorInputSE, 1000, 2000);
-  motorInputSW = constrain(motorInputSW, 1000, 2000);
-  motorInputNW = constrain(motorInputNW, 1000, 2000);
+  motorInputNW = constrain(motorInputNW, 0, 1023);
+  motorInputNE = constrain(motorInputNE, 0, 1023);
+  motorInputSE = constrain(motorInputSE, 0, 1023);
+  motorInputSW = constrain(motorInputSW, 0, 1023);
 
   // apply to motors
+  ledcWrite(motorChannelNW, motorInputNW);
+  ledcWrite(motorChannelNE, motorInputNE);
+  ledcWrite(motorChannelSE, motorInputSE);
+  ledcWrite(motorChannelSW, motorInputSW);
 
 //   Serial.print("Roll: ");
 //   Serial.print(rollAngle);
@@ -361,6 +375,22 @@ void setup() {
   }
   Serial.println("drone awake");
   delay(3000);
+
+  // Motors
+  int PWMFrequency = 10000;
+  int PWMResolution = 10;
+
+  ledcSetup(motorChannelNW, PWMFrequency, PWMResolution);
+  ledcAttachPin(motorPinNW, motorChannelNW);
+
+  ledcSetup(motorChannelNE, PWMFrequency, PWMResolution);
+  ledcAttachPin(motorPinNE, motorChannelNE);
+
+  ledcSetup(motorChannelSE, PWMFrequency, PWMResolution);
+  ledcAttachPin(motorPinSE, motorChannelSE);
+
+  ledcSetup(motorChannelSW, PWMFrequency, PWMResolution);
+  ledcAttachPin(motorPinSW, motorChannelSW);
 
   // AP
   WiFi.mode(WIFI_AP);
