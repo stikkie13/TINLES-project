@@ -1,6 +1,9 @@
 /*
 TO DO
 - juiste pins voor de motoren
+- hover de juiste waarde geven
+- PID tweaken
+
 - yaw PID ?
 - measure height ?
 - height PID ?
