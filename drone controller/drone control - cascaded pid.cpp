@@ -37,8 +37,8 @@ float dt = 0.01;
 const int WD_TIMEOUT = 5;
 
 // PID
-double kPAngle = 0.6, kIAngle = 3.5, kDAngle = 0.03;
-double kPRate = 2, kIRate = 12, kDRate = 0;
+const double kPAngle = 0.6, kIAngle = 3.5, kDAngle = 0.03;
+const double kPRate = 2, kIRate = 12, kDRate = 0;
 
 struct PIDReturn {
   double PID;
@@ -380,8 +380,8 @@ void setup() {
   delay(3000);
 
   // Motors
-  int PWMFrequency = 10000;
-  int PWMResolution = 10;
+  const int PWMFrequency = 10000;
+  const int PWMResolution = 10; // values 0 - 1023
 
   ledcSetup(motorChannelNW, PWMFrequency, PWMResolution);
   ledcAttachPin(motorPinNW, motorChannelNW);
