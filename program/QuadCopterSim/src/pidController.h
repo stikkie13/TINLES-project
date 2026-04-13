@@ -14,7 +14,7 @@ void setAltitude(double altitude);
 
 #define orrientationPropertionalGain 0.025
 #define orrientationIntegralGain 0.025
-#define orrientationDerivatigeGain 0.5
+#define orrientationDerivatigeGain 0.75
 
 struct pidStruct rollPid = {
     orrientationPropertionalGain, // Propertional gain constant
