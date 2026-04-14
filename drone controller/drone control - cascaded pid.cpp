@@ -19,18 +19,18 @@ TO DO
 
 #include <Arduino.h>
 #include <Wire.h>
-#include "esp_task_wdt.h"
+//#include "esp_task_wdt.h"
 #include <WiFi.h>
 #include <WebServer.h>
 
 // Motors
-#define motorPinNW 1 // dummy values voor de pins
+#define motorPinNW 33 // dummy values voor de pins
 #define motorChannelNW 0
-#define motorPinNE 2
-#define motorChannelNE 1
-#define motorPinSE 3
+#define motorPinNE 25
+#define motorChannelNE 1 
+#define motorPinSE 26
 #define motorChannelSE 2
-#define motorPinSW 4
+#define motorPinSW 27
 #define motorChannelSW 3
 
 // Gyro
@@ -40,9 +40,9 @@ float pitchAngle = 0;
 float alpha = 0.1; // factor for complimentary filter
 const TickType_t period = pdMS_TO_TICKS(4);
 TaskHandle_t gyroscopeTaskHandle;
-float dt = 0.01;
+float dt = 0.004;
 
-const int WD_TIMEOUT = 5;
+const int WD_TIMEOUT = 500;
 
 // PID
 const double kPAngle = 0.6, kIAngle = 3.5, kDAngle = 0.03;
@@ -57,12 +57,12 @@ struct PIDReturn {
 PIDReturn pitchAnglePID, rollAnglePID, pitchRatePID, rollRatePID;
 double targetPitch = 0, targetRoll = 0;
 
-int hover = 150;
+int hover = 1000; //500;
 int motorInputNW, motorInputNE, motorInputSE, motorInputSW;
 
 // AP
-#define button 32
-#define interrupt_button_gpio GPIO_NUM_32
+#define button 7 //32
+#define interrupt_button_gpio GPIO_NUM_7
 
 RTC_DATA_ATTR int bootCount = 0;
 
@@ -263,19 +263,19 @@ void stabilize(float Gx, float Gy) {
   ledcWrite(motorChannelSE, motorInputSE);
   ledcWrite(motorChannelSW, motorInputSW);
 
-//   Serial.print("Roll: ");
-//   Serial.print(rollAngle);
-//   Serial.print(" | Pitch: ");
-//   Serial.println(pitchAngle);
+  Serial.print("Roll: ");
+  Serial.print(rollAngle);
+  Serial.print(" | Pitch: ");
+  Serial.println(pitchAngle);
   
-//   Serial.print("NE: ");
-//   Serial.print(motorInputNE);
-//   Serial.print(" | SE: ");
-//   Serial.print(motorInputSE);
-//   Serial.print(" | SW: ");
-//   Serial.print(motorInputSW);
-//   Serial.print(" | NW: ");
-//   Serial.println(motorInputNW);
+  Serial.print("NE: ");
+  Serial.print(motorInputNE);
+  Serial.print(" | SE: ");
+  Serial.print(motorInputSE);
+  Serial.print(" | SW: ");
+  Serial.print(motorInputSW);
+  Serial.print(" | NW: ");
+  Serial.println(motorInputNW);
 }
 
 void gyroscopeTask(void *pvParameters) {
@@ -340,8 +340,8 @@ void gyroscopeTask(void *pvParameters) {
     stabilize(Gx, Gy);
 
     // Pet the watchdog
-    esp_task_wdt_reset();
-
+    /*esp_task_wdt_reset();
+    */
     vTaskDelayUntil(&lastWakeTime, period);
   }
 }
@@ -352,16 +352,16 @@ void sleepAndAPControl(void *pvParameters) {
   while(1){
     server.handleClient();
 
-    if(digitalRead(button) == LOW) {
+    /*if(digitalRead(button) == LOW) {
       while(digitalRead(button) == LOW) {
           delay(100);
       }
       Serial.println("drone asleep (loop())");
       esp_deep_sleep_start();
-    }
+    }*/
 
-    esp_task_wdt_reset();
-
+    /*esp_task_wdt_reset();
+    */
     vTaskDelayUntil(&lastWakeTime, period);
   }
 }
@@ -369,8 +369,13 @@ void sleepAndAPControl(void *pvParameters) {
 void setup() {
   // Sleep
   pinMode(button, INPUT_PULLUP);
+  
 
-  bootCount++;
+  pinMode(BUILTIN_LED, OUTPUT);
+
+  Serial.begin(115200);
+
+  /*bootCount++;
 
   esp_sleep_enable_ext0_wakeup(interrupt_button_gpio, LOW);
 
@@ -383,7 +388,8 @@ void setup() {
 
   while(digitalRead(button) == LOW) {
     delay(100);
-  }
+  }*/
+
   Serial.println("drone awake");
   delay(3000);
 
@@ -433,15 +439,13 @@ void setup() {
   Wire.write(0);     // default 250 deg/s
   Wire.endTransmission(true);
 
-  Serial.begin(115200);
-
   pitchAnglePID.integral = 0;
   rollAnglePID.integral = 0;
   pitchRatePID.integral = 0; 
   rollRatePID.integral = 0;
 
-  esp_task_wdt_init(WD_TIMEOUT, true); // !! false for debugging
-
+  /*esp_task_wdt_init(WD_TIMEOUT, true); // !! false for debugging
+*/
   // Create gyroscopeTask
   xTaskCreatePinnedToCore(
     gyroscopeTask,          // Task function
@@ -457,7 +461,7 @@ void setup() {
   xTaskCreatePinnedToCore(
     sleepAndAPControl,
     "sleepAndAPTaskHandle",
-    8192,
+    9216,
     NULL,
     2,
     &sleepAndAPTaskHandle,
@@ -465,8 +469,8 @@ void setup() {
   );
 
   // Enable watchdog for both tasks
-  esp_task_wdt_add(gyroscopeTaskHandle);
-  esp_task_wdt_add(sleepAndAPTaskHandle);
+  /*esp_task_wdt_add(gyroscopeTaskHandle);
+  esp_task_wdt_add(sleepAndAPTaskHandle);*/
 }
 
 void loop() {}
