@@ -3,6 +3,14 @@ TO DO
 - juiste pins voor de motoren
 - hover de juiste waarde geven
 - PID tweaken
+  - eerste de rate controller
+    - P
+    - D
+    - I
+  - dan de angle controller
+    - P
+    - D
+    - I
 
 - yaw PID ?
 - measure height ?
