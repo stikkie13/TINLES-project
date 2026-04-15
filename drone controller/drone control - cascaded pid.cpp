@@ -1,37 +1,33 @@
-/*
-TO DO
-- juiste pins voor de motoren
-- hover de juiste waarde geven
-- PID tweaken
-  - eerste de rate controller
-    - P
-    - D
-    - I
-  - dan de angle controller
-    - P
-    - D
-    - I
-
-- yaw PID ?
-- measure height ?
-- height PID ?
-*/
-
 #include <Arduino.h>
 #include <Wire.h>
-//#include "esp_task_wdt.h"
+#include "esp_task_wdt.h"
 #include <WiFi.h>
 #include <WebServer.h>
 
-// Motors
-#define motorPinNW 33 // dummy values voor de pins
+// Pins
+#define motorPinNW 1
 #define motorChannelNW 0
-#define motorPinNE 25
+#define motorPinNE 2
 #define motorChannelNE 1 
-#define motorPinSE 26
+#define motorPinSE 3
 #define motorChannelSE 2
-#define motorPinSW 27
+#define motorPinSW 4
 #define motorChannelSW 3
+
+#define button 7
+#define interrupt_button_gpio GPIO_NUM_7
+
+// #define motorPinNW 33
+// #define motorChannelNW 0
+// #define motorPinNE 25
+// #define motorChannelNE 1 
+// #define motorPinSE 26
+// #define motorChannelSE 2
+// #define motorPinSW 27
+// #define motorChannelSW 3
+
+// #define button 32
+// #define interrupt_button_gpio GPIO_NUM_32
 
 // Gyro
 const int MPU_addr = 0x68;
@@ -57,13 +53,10 @@ struct PIDReturn {
 PIDReturn pitchAnglePID, rollAnglePID, pitchRatePID, rollRatePID;
 double targetPitch = 0, targetRoll = 0;
 
-int hover = 1000; //500;
+int hover = 50;
 int motorInputNW, motorInputNE, motorInputSE, motorInputSW;
 
 // AP
-#define button 7 //32
-#define interrupt_button_gpio GPIO_NUM_7
-
 RTC_DATA_ATTR int bootCount = 0;
 
 const char *ssid = "ESP32S3-AP";
@@ -199,8 +192,9 @@ void joystickInterrupt() {
   int roll = server.arg("angleX").toInt();
   int pitch = server.arg("angleY").toInt();
 
+  Serial.print("roll: ");
   Serial.print(roll);
-  Serial.print(", ");
+  Serial.print(", pitch: ");
   Serial.println(pitch);
 
   targetPitch = pitch;
@@ -263,19 +257,19 @@ void stabilize(float Gx, float Gy) {
   ledcWrite(motorChannelSE, motorInputSE);
   ledcWrite(motorChannelSW, motorInputSW);
 
-  Serial.print("Roll: ");
-  Serial.print(rollAngle);
-  Serial.print(" | Pitch: ");
-  Serial.println(pitchAngle);
+  // Serial.print("Roll: ");
+  // Serial.print(rollAngle);
+  // Serial.print(" | Pitch: ");
+  // Serial.println(pitchAngle);
   
-  Serial.print("NE: ");
-  Serial.print(motorInputNE);
-  Serial.print(" | SE: ");
-  Serial.print(motorInputSE);
-  Serial.print(" | SW: ");
-  Serial.print(motorInputSW);
-  Serial.print(" | NW: ");
-  Serial.println(motorInputNW);
+  // Serial.print("NE: ");
+  // Serial.print(motorInputNE);
+  // Serial.print(" | SE: ");
+  // Serial.print(motorInputSE);
+  // Serial.print(" | SW: ");
+  // Serial.print(motorInputSW);
+  // Serial.print(" | NW: ");
+  // Serial.println(motorInputNW);
 }
 
 void gyroscopeTask(void *pvParameters) {
@@ -340,8 +334,8 @@ void gyroscopeTask(void *pvParameters) {
     stabilize(Gx, Gy);
 
     // Pet the watchdog
-    /*esp_task_wdt_reset();
-    */
+    esp_task_wdt_reset();
+    
     vTaskDelayUntil(&lastWakeTime, period);
   }
 }
@@ -352,16 +346,16 @@ void sleepAndAPControl(void *pvParameters) {
   while(1){
     server.handleClient();
 
-    /*if(digitalRead(button) == LOW) {
+    if(digitalRead(button) == LOW) {
       while(digitalRead(button) == LOW) {
           delay(100);
       }
       Serial.println("drone asleep (loop())");
       esp_deep_sleep_start();
-    }*/
+    }
 
-    /*esp_task_wdt_reset();
-    */
+    esp_task_wdt_reset();
+    
     vTaskDelayUntil(&lastWakeTime, period);
   }
 }
@@ -370,17 +364,17 @@ void setup() {
   // Sleep
   pinMode(button, INPUT_PULLUP);
   
-
   pinMode(BUILTIN_LED, OUTPUT);
 
   Serial.begin(115200);
 
-  /*bootCount++;
+  bootCount++;
 
   esp_sleep_enable_ext0_wakeup(interrupt_button_gpio, LOW);
 
   esp_sleep_wakeup_cause_t wakeup_reason;
   wakeup_reason = esp_sleep_get_wakeup_cause();
+  Serial.println(wakeup_reason);
   if(bootCount == 1 || wakeup_reason != ESP_SLEEP_WAKEUP_EXT0) {
     Serial.println("drone asleep (setup())");
     esp_deep_sleep_start();
@@ -388,14 +382,14 @@ void setup() {
 
   while(digitalRead(button) == LOW) {
     delay(100);
-  }*/
+  }
 
   Serial.println("drone awake");
   delay(3000);
 
   // Motors
   const int PWMFrequency = 10000;
-  const int PWMResolution = 10; // values 0 - 1023
+  const int PWMResolution = 10; // values 0 - 1023 for PWM
 
   ledcSetup(motorChannelNW, PWMFrequency, PWMResolution);
   ledcAttachPin(motorPinNW, motorChannelNW);
@@ -444,8 +438,8 @@ void setup() {
   pitchRatePID.integral = 0; 
   rollRatePID.integral = 0;
 
-  /*esp_task_wdt_init(WD_TIMEOUT, true); // !! false for debugging
-*/
+  esp_task_wdt_init(WD_TIMEOUT, true); // !! false for debugging
+
   // Create gyroscopeTask
   xTaskCreatePinnedToCore(
     gyroscopeTask,          // Task function
@@ -469,8 +463,27 @@ void setup() {
   );
 
   // Enable watchdog for both tasks
-  /*esp_task_wdt_add(gyroscopeTaskHandle);
-  esp_task_wdt_add(sleepAndAPTaskHandle);*/
+  esp_task_wdt_add(gyroscopeTaskHandle);
+  esp_task_wdt_add(sleepAndAPTaskHandle);
 }
 
 void loop() {}
+
+/*
+TO DO
+- juiste pins voor de motoren
+- hover de juiste waarde geven
+- PID tweaken
+  - eerste de rate controller
+    - P
+    - D
+    - I
+  - dan de angle controller
+    - P
+    - D
+    - I
+
+- yaw PID ?
+- measure height ?
+- height PID ?
+*/
