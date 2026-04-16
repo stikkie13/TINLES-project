@@ -26,11 +26,11 @@ const TickType_t period = pdMS_TO_TICKS(4);
 TaskHandle_t gyroscopeTaskHandle;
 float dt = 0.004;
 
-const int WD_TIMEOUT = 500;
+const int WD_TIMEOUT = 5;
 
 // PID
-const double kPAngle = 0.6, kIAngle = 3.5, kDAngle = 0.03;
-const double kPRate = 2, kIRate = 12, kDRate = 0;
+const double kPAngle = 3, kIAngle = 0.1, kDAngle = 0;
+const double kPRate = 0.08, kIRate = 0.02, kDRate = 0.001;
 
 struct PIDReturn {
   double PID;
@@ -150,7 +150,7 @@ const char* htmlPage = R"rawliteral(
       dx = dx / 4;
       dy = dy / 4;
 
-      output.innerText = `X: ${Math.round(dx)} | Y: ${Math.round(dy)}`;
+      output.innerText = `Roll: ${Math.round(dx)} | Pitch: ${Math.round(dy)}`;
 
       if(Date.now() - lastUpdate > 50) {
         fetch("/joystick?angleX=" + Math.round(dx) + "&angleY=" + Math.round(dy));
@@ -162,7 +162,7 @@ const char* htmlPage = R"rawliteral(
       dragging = false;
       stick.style.left = "60px";
       stick.style.top = "60px";
-      output.innerText = "X: 0 | Y: 0";
+      output.innerText = "Roll: 0 | Pitch: 0";
 
       fetch("/joystick?angleX=" + 0 + "&angleY=" + 0);
     }
@@ -176,7 +176,7 @@ void handleRoot() {
   server.send(200, "text/html", htmlPage);
 }
 
-void joystickInterrupt() {
+void handleJoystick() {
   int roll = server.arg("angleX").toInt();
   int pitch = server.arg("angleY").toInt();
 
@@ -191,7 +191,7 @@ void joystickInterrupt() {
   handleRoot();
 }
 
-void OFFInterrupt() {
+void handleOFF() {
   Serial.println("drone asleep (handleOFF())");
   server.close();
   esp_deep_sleep_start();
@@ -399,8 +399,8 @@ void setup() {
   Serial.println(WiFi.softAPIP());
 
   server.on("/", handleRoot);
-  server.on("/joystick", joystickInterrupt);
-  server.on("/OFF", OFFInterrupt);
+  server.on("/joystick", handleJoystick);
+  server.on("/OFF", handleOFF);
 
   server.begin();
 
