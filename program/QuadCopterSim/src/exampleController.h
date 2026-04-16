@@ -1,0 +1,44 @@
+#ifndef controllerTarg
+#define controllerTarg "example"
+
+#include "./simulator.c"
+#include "./pid.ambigious.c"
+
+// Simulation time is set in "simulator_web_interface"
+extern double simulation_time;
+
+double altitudeTarget = 5;
+
+struct pidStruct altitudePID = {
+    1,   // Propertional gain constant
+    0.1, // Integral gain constant
+    5,   // Derivative gain constant
+    0.1, // Anti-windup constant
+    1,   // Time constant for deprivative filtering
+    Δt,  // Timestep
+    1,   // Max command
+    0,   // Min command
+    40,  // Max rate of change of the command
+    0,   // Integral term
+    0,   // Previous error
+    0,   // Previous derivative
+    0,   // Previous saturated command
+    0    // Previous command
+};
+
+// proportional controller for acro/roll mode.
+// CONTROLLER_P_ACRO calculates the desired rates from the sticks and applies a
+// proportional controller to calculate the motors' duty cycles
+// Duty cycle for each motor?
+// sticks x,y,x,y?
+// Gyro XYZ rot?
+void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], double accel[3], double altitude)
+{
+    pidNumber altitudeCommand = PID_Step(&altitudePID, altitude, altitudeTarget);
+    for (int i = 0; i < 4; i++)
+    {
+        duty_cycle[i] = altitudeCommand;
+    }
+}
+
+#endif

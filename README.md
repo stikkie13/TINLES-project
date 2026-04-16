@@ -1,15 +1,15 @@
 Dit is het project van de [TINLAB Embedded Systems](./assets/Cursushandleiding_TINLES03_2025_2026.pdf)
 
-For the simulator visit [our other repository](https://github.com/XXXXKLAUSXXX/QuadCopterSim)
+For the simulator visit the [quad copter sim folder](./program/QuadCopterSim/README.md)
 
 Documentatie wordt gedaan via obsidian.
 
 Project leden:
-- [Ember Durkin](members/Ember-Durkin.md)
-- [Jordy van den Bos](./members/Jordy-van-den-Bos.md)
-- [Mia Stikvoort](./members/Mia-Stikvoort.md)
-- [Peter Hoogenboezem](./members/Peter-Hoogenboezem.md)
-- [Wen Hao You](./members/Wen-Hao-You.md)
+- Ember Durkin
+- Jordy van den Bos
+- Mia Stikvoort
+- Peter Hoogenboezem
+- Wen Hao You
 
 Project Ideeën
 - [Smart-Fan](./project-ideas/Smart-Fan.md)
