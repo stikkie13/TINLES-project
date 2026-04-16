@@ -12,20 +12,27 @@ Slow down pids verrryyyyy much
 
 void setAltitude(double altitude);
 
-#define orrientationPropertionalGain 0.025
-#define orrientationIntegralGain 0.025
-#define orrientationDerivatigeGain 0.5
+#define orrientationPropertionalGain 1/40
+#define orrientationIntegralGain 2/4
+#define orrientationDerivatigeGain 3/2
+
+// Multiplies pid command
+#define orrientationStrength 1
+#define altitudeStrength 1
+
+#define antiwindup 1
+#define orrientationMaxRateOfChange 1
 
 struct pidStruct rollPid = {
     orrientationPropertionalGain, // Propertional gain constant
     orrientationIntegralGain,     // Integral gain constant
     orrientationDerivatigeGain,   // Derivative gain constant
-    0,                            // Anti-windup constant
+    antiwindup,                   // Anti-windup constant
     1,                            // Time constant for deprivative filtering
     Δt,                           // Timestep
     1,                            // Max command
     -1,                           // Min command
-    40,                           // Max rate of change of the command
+    orrientationMaxRateOfChange,  // Max rate of change of the command
     0,                            // Integral term
     0,                            // Previous error
     0,                            // Previous derivative
@@ -37,12 +44,12 @@ struct pidStruct pitchPid = {
     orrientationPropertionalGain, // Propertional gain constant
     orrientationIntegralGain,     // Integral gain constant
     orrientationDerivatigeGain,   // Derivative gain constant
-    0,                            // Anti-windup constant
+    antiwindup,                   // Anti-windup constant
     1,                            // Time constant for deprivative filtering
     Δt,                           // Timestep
     1,                            // Max command
     -1,                           // Min command
-    40,                           // Max rate of change of the command
+    orrientationMaxRateOfChange,  // Max rate of change of the command
     0,                            // Integral term
     0,                            // Previous error
     0,                            // Previous derivative
@@ -58,7 +65,7 @@ struct pidStruct altitudePID = {
     1,     // Time constant for deprivative filtering
     Δt,    // Timestep
     1,     // Max command
-    0,    // Min command
+    0,     // Min command
     40,    // Max rate of change of the command
     0,     // Integral term
     0,     // Previous error
@@ -94,9 +101,10 @@ void controller_p_acro(double duty_cycle[4], double sticks[4], double gyro[3], d
     // {0,1,0,-1}
     pidNumber pitchCommand = PID_Step(&pitchPid, absoluteGyro[1], pitchTarget);
 
-    pidNumber altitudeCommand = PID_Step(&altitudePID, altitude, altitudeTarget);
+    pidNumber altitudeCommand = 0;
+    // PID_Step(&altitudePID, altitude, altitudeTarget);
 
-    // setAltitude(4);
+    setAltitude(4);
 
     for (int i = 0; i < 4; i++)
     {
