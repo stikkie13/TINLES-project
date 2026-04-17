@@ -99,7 +99,7 @@ const char* htmlPage = R"rawliteral(
 
   <button onclick="location.href='/OFF'">OFF</button>
 
-  <p id="output">X: 0 | Y: 0</p>
+  <p id="output">Roll: 0 | Pitch: 0</p>
 
   <script>
     const stick = document.getElementById("stick");
@@ -355,7 +355,7 @@ void setup() {
 
   Serial.begin(115200);
 
-  bootCount++;
+  /*bootCount++;
 
   esp_sleep_enable_ext0_wakeup(interrupt_button_gpio, LOW);
 
@@ -369,7 +369,7 @@ void setup() {
 
   while(digitalRead(button) == LOW) {
     delay(100);
-  }
+  }*/
 
   Serial.println("drone awake");
   delay(3000);
