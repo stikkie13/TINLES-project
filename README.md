@@ -24,7 +24,7 @@ While uploading, the error:
 "Error: Please specify `upload_port` for environment or use global `--upload-port` option."
 Might occur.
 
-Firstly, please ensure the microcontroller is plugged into your laptop and the connection is not being used by another program (e.g. Arduino IDE).
+If this happens, please ensure the microcontroller is plugged into your laptop and the connection is not being used by another program (e.g. Arduino IDE).
 If this has not resolved the issue, please unplug the cable from the drone's microcontroller, hold the boot button indicated by "B" on the microcontroller and plug the cable back in.
 This should resolve the issue.
 
