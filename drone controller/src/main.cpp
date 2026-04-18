@@ -244,20 +244,6 @@ void stabilize(float Gx, float Gy) {
   ledcWrite(motorChannelNE, motorInputNE);
   ledcWrite(motorChannelSE, motorInputSE);
   ledcWrite(motorChannelSW, motorInputSW);
-
-  // Serial.print("Roll: ");
-  // Serial.print(rollAngle);
-  // Serial.print(" | Pitch: ");
-  // Serial.println(pitchAngle);
-  
-  // Serial.print("NE: ");
-  // Serial.print(motorInputNE);
-  // Serial.print(" | SE: ");
-  // Serial.print(motorInputSE);
-  // Serial.print(" | SW: ");
-  // Serial.print(motorInputSW);
-  // Serial.print(" | NW: ");
-  // Serial.println(motorInputNW);
 }
 
 void gyroscopeTask(void *pvParameters) {
@@ -355,7 +341,7 @@ void setup() {
 
   Serial.begin(115200);
 
-  /*bootCount++;
+  bootCount++;
 
   esp_sleep_enable_ext0_wakeup(interrupt_button_gpio, LOW);
 
@@ -369,7 +355,7 @@ void setup() {
 
   while(digitalRead(button) == LOW) {
     delay(100);
-  }*/
+  }
 
   Serial.println("drone awake");
   delay(3000);
@@ -436,14 +422,14 @@ void setup() {
     NULL,                   // Parameter to pass to the task
     3,                      // Task priority
     &gyroscopeTaskHandle,   // Task handle
-    1                       // Core (0 for communication, 1 for calculations and control)
+    1                       // Core 1 for the most important task
   );
 
   // Create sleep and AP task
   xTaskCreatePinnedToCore(
     sleepAndAPControl,
     "sleepAndAPTaskHandle",
-    9216,
+    9216,                  // 9216 to be able to handle the HTML page
     NULL,
     2,
     &sleepAndAPTaskHandle,
