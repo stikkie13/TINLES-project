@@ -1,8 +1,8 @@
-# Groep 4 embedded systems: Drone
+# Group 4 embedded systems: Drone
 
-Dit is het project van de [TINLAB Embedded Systems](./assets/Cursushandleiding_TINLES03_2025_2026.pdf)
+This project is part of [TINLAB Embedded Systems](./assets/Cursushandleiding_TINLES03_2025_2026.pdf)
 
-Project leden:
+Project members:
 - Ember Durkin
 - Jordy van den Bos
 - Mia Stikvoort
@@ -27,6 +27,18 @@ Might occur.
 Firstly, please ensure the microcontroller is plugged into your laptop and the connection is not being used by another program (e.g. Arduino IDE).
 If this has not resolved the issue, please unplug the cable from the drone's microcontroller, hold the boot button indicated by "B" on the microcontroller and plug the cable back in.
 This should resolve the issue.
+
+### Turning on the drone
+When the code is uploaded, the drone starts in deep sleep mode and is turned off. The drone can be pulled out of this mode by pressing the button on the drone's frame (not the ones one the microcontroller).
+When this is pressed the drone will awake from deep sleep and after three seconds it will turn on. This is indicated by an orange light on the microcontroller.
+
+### Controlling the drone
+Now that the orange light is on, a new Wi-Fi option is available. This is the access point of the drone and it has the name "ESP32S3-AP". To connect to the point the password "embeddedgroup4" is required. When connected to this access point, you can go to the IP adres 192.168.4.1, where you will find the controlls of the drone.
+
+With the joystick the drone can be steered in any direction, with the angle depending om where the joystick is aimed and how far it is aimed. When the joystick is being held in the middle of the circle or not held at all, the drone will assume a horizontal angle.
+The "OFF" button can be used to turn off the drone. When this button is pressed, the drone will turn off immediately. For this reason, it is advised to firstly land the drone of get it to a safe position before turning it off.
+
+
 
 ## Program folder
 For the simulator visit the [quad copter sim folder](./program/QuadCopterSim/README.md)
