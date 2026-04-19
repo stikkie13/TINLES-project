@@ -44,3 +44,4 @@ The "OFF" button can be used to turn off the drone. When this button is pressed,
 For the simulator visit the [quad copter sim folder](./program/QuadCopterSim/README.md)
 
 ## Electrical-diagram folder
+This folder includes the files for the electrical wiring of the drone.
