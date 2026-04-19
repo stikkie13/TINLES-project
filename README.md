@@ -38,8 +38,6 @@ Now that the orange light is on, a new Wi-Fi option is available. This is the ac
 With the joystick the drone can be steered in any direction, with the angle depending om where the joystick is aimed and how far it is aimed. When the joystick is being held in the middle of the circle or not held at all, the drone will assume a horizontal angle.
 The "OFF" button can be used to turn off the drone. When this button is pressed, the drone will turn off immediately. For this reason, it is advised to firstly land the drone of get it to a safe position before turning it off.
 
-
-
 ## Program folder
 For the simulator visit the [quad copter sim folder](./program/QuadCopterSim/README.md)
 
