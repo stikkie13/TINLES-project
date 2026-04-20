@@ -8,7 +8,8 @@ Project members:
 - Mia Stikvoort
 - Peter Hoogenboezem
 
-<img width="2040" height="1148" alt="image" src="https://github.com/user-attachments/assets/d5177fea-0896-432e-bdb0-7f9de5e27bda" />
+<img width="1291" height="1148" src="https://github.com/user-attachments/assets/920bd782-436f-488e-9936-31033d184a10" />
+
 
 ## Drone controller folder
 This folder includes the PlatformIO project for the controller code of the drone.
