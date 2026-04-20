@@ -8,6 +8,8 @@ Project members:
 - Mia Stikvoort
 - Peter Hoogenboezem
 
+<img width="2040" height="1148" alt="image" src="https://github.com/user-attachments/assets/d5177fea-0896-432e-bdb0-7f9de5e27bda" />
+
 ## Drone controller folder
 This folder includes the PlatformIO project for the controller code of the drone.
 To upload the code to the drone, the VSCode PlatformIO extension will need to be installed.
